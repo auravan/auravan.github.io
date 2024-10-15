@@ -36,11 +36,11 @@ Here are some ideas to get you started:
 
 <div align="center">
     <strong>Languages</strong><br><br>
-    <code><img height="20" src="https://img.shields.io/badge/C%2B%2B-00599C?style=for-the-badge&logo=c%2B%2B&logoColor=white" alt="C++" title="C++"></code>
+    <!-- <code><img height="20" src="https://img.shields.io/badge/C%2B%2B-00599C?style=for-the-badge&logo=c%2B%2B&logoColor=white" alt="C++" title="C++"></code> -->
     <code><img height="20" src="https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue" alt="Python" title="Python"></code>
     <code><img height="20" src="https://img.shields.io/badge/Markdown-000000?style=for-the-badge&logo=markdown&logoColor=white" alt="Markdown" title="Markdown"></code>
     <code><img height="20" src="https://img.shields.io/badge/LaTeX-47A141?style=for-the-badge&logo=LaTeX&logoColor=white" alt="LaTex" title="LaTex"></code>
-    <code><img height="20" src="https://img.shields.io/badge/C%23-239120?style=for-the-badge&logo=c-sharp&logoColor=white" alt="C#" title="C#"></code>
+    <!-- <code><img height="20" src="https://img.shields.io/badge/C%23-239120?style=for-the-badge&logo=c-sharp&logoColor=white" alt="C#" title="C#"></code> -->
     <br><br><strong>Frameworks</strong><br><br>
     <code><img height="20" src="https://img.shields.io/badge/PyTorch-EE4C2C?style=for-the-badge&logo=PyTorch&logoColor=white" alt="Pytorch" title="Pytorch"></code>
     <code><img height="20" src="https://img.shields.io/badge/Numpy-777BB4?style=for-the-badge&logo=numpy&logoColor=white" alt="Numpy" title="Numpy"></code>
@@ -57,11 +57,11 @@ Here are some ideas to get you started:
     <code><img height="20" src="https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white" alt="ubuntu" title="ubuntu"></code>
     <code><img height="20" src="https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black" alt="Linux" title="Linux"></code>
     <code><img height="20" src="https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white" alt="Win" title="Win"></code>
-    <br><br><strong>Game Platform 😆</strong><br><br>
+    <!-- <br><br><strong>Game Platform 😆</strong><br><br>
     <a href="https://steamcommunity.com/id/auravan/">
         <code><img height="20" src="https://img.shields.io/badge/Steam-000000?style=for-the-badge&logo=steam&logoColor=white" alt="Steam" title="Steam"></code>
     </a>
-    <code><img height="20" src="https://img.shields.io/badge/Epic%20Games-313131?style=for-the-badge&logo=Epic%20Games&logoColor=white" alt="Epic" title="Epic"></code>
+    <code><img height="20" src="https://img.shields.io/badge/Epic%20Games-313131?style=for-the-badge&logo=Epic%20Games&logoColor=white" alt="Epic" title="Epic"></code> -->
 </div>
 
 ---
@@ -80,7 +80,7 @@ HTML     2 mins          🟨⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜
 
 <!--END_SECTION:waka-->
 
-<div align="center">
+<!-- <div align="center">
     <img style="float: center; width: 48%; min-width: 300px; margin: 2px;" src="https://gist.githubusercontent.com/auravan/94a699517170510e22bbcf84270c61f9/raw/general.svg">
     <img style="float: center; width: 48%; min-width: 300px; margin: 2px;" src="https://gist.githubusercontent.com/auravan/94a699517170510e22bbcf84270c61f9/raw/misc.svg">
-</div>
+</div> -->
