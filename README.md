@@ -2,21 +2,6 @@
 
 - 💬 More about me ([resume](https://auravan.github.io), latest update 2024/10)
 
-<!--
-**auravan/auravan** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
-
-Here are some ideas to get you started:
-
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
-
 <div align="center">
     <p>
         <a href="https://github.com/auravan" class="rich-diff-level-one">
@@ -26,11 +11,11 @@ Here are some ideas to get you started:
     </p>
 </div>
 
-<div align="center">
+<!-- <div align="center">
     <a href="https://github.com/auravan">
         <img src="https://gist.githubusercontent.com/auravan/94a699517170510e22bbcf84270c61f9/raw/basic.svg">
     </a>
-</div>
+</div> -->
 
 ---
 
@@ -64,19 +49,19 @@ Here are some ideas to get you started:
     <code><img height="20" src="https://img.shields.io/badge/Epic%20Games-313131?style=for-the-badge&logo=Epic%20Games&logoColor=white" alt="Epic" title="Epic"></code> -->
 </div>
 
----
+<!-- ---
 
-:bar_chart: **This week I spent my time on:**
+:bar_chart: **This week I spent my time on:** -->
 
 <!--START_SECTION:waka-->
 
-```txt
+<!-- ```txt
 From: 07 October 2024 - To: 14 October 2024
 
 Python   1 hr 4 mins     🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩⬜⬜⬜⬜⬜⬜⬜⬜⬜   63.30 %
 Other    34 mins         🟩🟩🟩🟩🟩🟩🟩🟩🟨⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜   33.93 %
 HTML     2 mins          🟨⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜   02.77 %
-```
+``` -->
 
 <!--END_SECTION:waka-->
 
