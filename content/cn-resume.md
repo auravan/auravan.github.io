@@ -16,7 +16,7 @@ disable_prismjs: true
 
 # <span class="material-symbols material-symbols-target-outline"></span> 研究兴趣
 
-- 现从事**人脸识别**在**犄角旮旯**的**交付工作**。
+- 现从事**人脸识别设备**在**各行各业**的**交付**工作。
 - 对**音乐科技**和**数据科学**领域的应用充满兴趣。
 
 # <span class="material-symbols material-symbols-school-outline"></span> 教育背景
@@ -26,7 +26,7 @@ disable_prismjs: true
 # <span class="material-symbols material-symbols-groups-outline"></span> 工作经历
 
 1. 2024.08 ~ 至今    [**魔点科技**](https://www.moredian.com/#)初级产品经理 
-2. 2024.03 ~ 2020.06 [**大头与你**](https://www.asktable.com)初级工程师     
+2. 2024.03 ~ 2024.06 [**DataMini**](https://www.asktable.com)初级程序员     
 
 # <span class="material-symbols material-symbols-list-alt-outline"></span> 项目经历
 
@@ -40,7 +40,11 @@ _2024.02 ~ 2024.02 落地交付_
 
 - **姿态估计解决方案**：**从0-1**理解了用户需求，完成了[openmmlab](https://openmmlab.com/)的MMpose姿势关节检测算法部署。
 
-## 
+## 算法应用
+
+_2023.07 ~ 2024.07 数据分析兼职_
+
+- **人工湖选址**：依据GIS系统的地表热量遥感信息，应用K-means提供新增湖南省适宜水体地点参考并作可视化。
 <!-- - **智能环控**：设计和实现了基于时间序列分析，深度学习和强化学习智能环控算法和解决方案。将智能环控算法拆解为环境模型和控制模型两部分，实现了同一作物和家畜在不同环境下种养殖模型的复用。通过专家知识引擎和机器学习算法实现了在保持现有产量不变的前提下各项环境指标控制误差相比于人工降低了 **50%+**，整体平均成本（水，电，肥等）降低 **20%+**。参加 2019 年国际智慧温室种植挑战赛，在 24 小时 Hackathon 模拟挑战赛中，获得人工智能策略方法 **4/21** 名，虚拟西红柿种植净利润 **9/21** 名。
 - **智能集蛋**：设计和实现了一套基于计算机视觉和 IoT 传感器的智能集蛋装置和算法。在笼养模式集蛋过程中，利用摄像头和 IoT 传感器采集的数据实现了鸡蛋计数和隶属笼体的识别，准确率 **99%+**。通过鸡蛋隶属笼体识别可以精准分析不同笼体内的料蛋比，为淘汰鸡提供强有力的数据支持，同时也为蛋品的溯源提供了更细力度的数据。 -->
 
@@ -112,6 +116,7 @@ _2015.04 ~ 2015.10 算法设计和开发_
 
 <!-- - **技术主页**：[https://auravan.tech](https://aruavan.tech) -->
 - **Github**: [https://github.com/auravan](https://github.com/auravan) ![github-followers](https://img.shields.io/github/followers/auravan?style=social&label=Follow)
+- **LeetCode**:[https://leetcode.cn/u/aura_van/](https://leetcode.cn/u/aura_van/)
 - **BillBill**:[https://space.bilibili.com/28567547](https://space.bilibili.com/28567547)
 
 <!-- 1. [R 语言数据科学导论](https://ds-r.leovan.tech)：一份以 R 语言为基础的数据科学入门教程。![github-stars](https://img.shields.io/github/stars/leovan/data-science-introduction-with-r.svg?style=social&label=Stars)s

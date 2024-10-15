@@ -4,6 +4,11 @@
   "description": "李崎滨的个人网站",
   "icons": [
     {
+      "src": "/images/web/favicon-62x62.png",
+      "type": "image/png",
+      "sizes": "62x62"
+    },
+    {
       "src": "/images/web/icon-192x192.png",
       "type": "image/png",
       "sizes": "192x192"

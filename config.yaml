@@ -1,4 +1,4 @@
-baseURL: "https://leovan.me/"
+baseURL: "http://auravan.top/"
 enableEmoji: true
 hasCJKLanguage: true
 ignoreFiles:
@@ -20,56 +20,60 @@ languageCode: "zh-cn"
 title: "李崎滨 | Arua Van"
 rssLimit: 100
 
-services:
-  googleAnalytics:
-    ID: "G-RJC7CCKE67"
+# services:
+#   googleAnalytics:
+#     ID: "G-RJC7CCKE67"
 
 permalinks:
-  cn: "/cn/:year/:month/:slug/"
+  cn_aura: "/cn_aura/:year/:month/:slug/"
   en: "/en/:year/:month/:slug/"
   tech101: "/tech101/:year/:month/:slug/"
+  rss: "/cn_aura/index.xml"
 
-taxonomies:
-  category: categories
+# taxonomies:
+#   category: categories
 
 menu:
   home:
     - name: "博客"
-      url: "/cn1/"
+      url: "/cn_aura/"
       weight: 1
+    # - identifier: "cn-menu-separator-1"
+    #   url: "#menu-separator"
+    #   weight: 2
     - name: "关于"
-      url: "/cn1/about/"
-      weight: 2
-    - name: "Blog"
-      url: "/en1/"
+      url: "/cn/about/"
       weight: 3
-    - name: "About"
-      url: "/en1/about/"
+    - name: "研究"
+      url: "/research"
       weight: 4
+    # - name: "About"
+    #   url: "/en1/about/"
+    #   weight: 5
   main:
     - name: "首页"
       url: "/"
       weight: 1
     - name: "博客"
-      url: "/1cn/"
+      url: "/cn_aura/"
       weight: 2
     - name: "分类"
-      url: "/1categories/"
+      url: "/categories/"
       weight: 3
     - identifier: "cn-menu-separator-1"
       url: "#menu-separator"
       weight: 4
-    - name: "摄影"
-      url: "/1photography/"
+    - name: "绘画"
+      url: "/painting/"
       weight: 5
-    - name: "烹饪"
-      url: "/1cooking/"
-      weight: 6
-    - name: "摩托"
-      url: "/1motorcycle/"
-      weight: 7
+    # - name: "烹饪"
+    #   url: "/1cooking/"
+    #   weight: 6
+    # - name: "摩托"
+    #   url: "/1motorcycle1/"
+    #   weight: 7
     - name: "关于"
-      url: "/cn1/about/"
+      url: "/cn/about/"
       weight: 8
     - name: "简历"
       url: "/cn/resume/"
@@ -79,7 +83,7 @@ menu:
       url: "/"
       weight: 1
     - name: "Blog"
-      url: "/en/"
+      url: "/1en/"
       weight: 2
     - name: "Categories"
       url: "/categories/"
@@ -95,10 +99,10 @@ menu:
       weight: 6
 
 params:
-  description: "李崎滨的个人网站 | Leo Van's Personal Website"
-  footer: "Copyright &copy; 2024-{Year} [李崎滨 | Aura Van](/)从leovan.me fork"
-  licenseURL: "https://github.com/leovan/leovan.me/blob/main/LICENSE"
-  googleAdsense: "ca-pub-2608165017777396"
+  description: "李崎滨的个人网站 | Build with blogdown"
+  footer: "Copyright &copy; 2024-{Year} [李崎滨 | Aura Van]"
+  # licenseURL: "https://github.com/leovan/leovan.me/blob/main/LICENSE"
+  googleAdsense: "ca-pub-1217183586241699"
   categories: "分类 | Categories"
 
   aplayerVersion: "1.10.1"
@@ -109,7 +113,7 @@ params:
   justifiedgalleryVersion: "3.8.1"
   lazysizesVersion: "5.3.2"
   lightgalleryVersion: "2.7.2"
-  mathjaxVersion: "3.2.2"
+  mathjaxVersion: "3.2"
   meetingjsVersion: "latest"
   pseudocodeVersion: "latest"
   prismjsVersion: "1.29.0"
@@ -182,7 +186,7 @@ params:
       cn: "赞 赏"
       en: "DONATE"
     donate_slogan:
-      cn: "「真诚赞赏，手留余香」"
+      cn: "「往来无百丁，请君备注留姓名（wx)」"
       en: "「Donation Given, Fragrance in Hand」"
     donate_2_cny:
       cn: "2 元"
@@ -213,4 +217,4 @@ markup:
       autoHeadingIDType: blackfriday
   tableOfContents:
     startLevel: 1
-    endLevel: 4
+    endLevel: 4 
