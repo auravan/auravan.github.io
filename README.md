@@ -1,6 +1,6 @@
 ### Hi there, I'm QiBin Li
 
-- 💬 More about me ([resume](https://auravan.github.io), latest update 2024/10)
+- 💬 More about me ([resume](https://auravan.github.io/cn/resume/), latest update 2024/10)
 
 <div align="center">
     <p>
@@ -29,16 +29,16 @@
     <br><br><strong>Frameworks</strong><br><br>
     <code><img height="20" src="https://img.shields.io/badge/PyTorch-EE4C2C?style=for-the-badge&logo=PyTorch&logoColor=white" alt="Pytorch" title="Pytorch"></code>
     <code><img height="20" src="https://img.shields.io/badge/Numpy-777BB4?style=for-the-badge&logo=numpy&logoColor=white" alt="Numpy" title="Numpy"></code>
-    <code><img height="20" src="https://img.shields.io/badge/Qt-41CD52?style=for-the-badge&logo=qt&logoColor=white" alt="Qt" title="Qt"></code>
+    <!-- <code><img height="20" src="https://img.shields.io/badge/Qt-41CD52?style=for-the-badge&logo=qt&logoColor=white" alt="Qt" title="Qt"></code>
     <code><img height="20" src="https://img.shields.io/badge/Unity-100000?style=for-the-badge&logo=unity&logoColor=white" alt="Unity" title="Unity"></code>
-    <code><img height="20" src="https://img.shields.io/badge/matlab-fa5103?style=for-the-badge&logo=MATLAB&logoColor=white" alt="Matlab" title="Matlab"></code>
+    <code><img height="20" src="https://img.shields.io/badge/matlab-fa5103?style=for-the-badge&logo=MATLAB&logoColor=white" alt="Matlab" title="Matlab"></code> -->
     <br><br><strong>Tools and Environments</strong><br><br>
     <code><img height="20" src="https://img.shields.io/badge/GIT-E44C30?style=for-the-badge&logo=git&logoColor=white" alt="Git" title="Git"></code>
     <code><img height="20" src="https://img.shields.io/badge/Visual_Studio_Code-0078D4?style=for-the-badge&logo=visual%20studio%20code&logoColor=white" alt="VSCode" title="VSCode"></code>
     <code><img height="20" src="https://img.shields.io/badge/conda-342B029.svg?&style=for-the-badge&logo=anaconda&logoColor=white" alt="conda" title="conda"></code>
     <code><img height="20" src="https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white" alt="docker" title="docker"></code>
     <code><img height="20" src="https://img.shields.io/badge/tmux-1BB91F?style=for-the-badge&logo=tmux&logoColor=white" alt="tmux" title="tmux"></code>
-    <code><img height="20" src="https://img.shields.io/badge/CMake-064F8C?style=for-the-badge&logo=cmake&logoColor=white" alt="cmake" title="cmake"></code>
+    <!-- <code><img height="20" src="https://img.shields.io/badge/CMake-064F8C?style=for-the-badge&logo=cmake&logoColor=white" alt="cmake" title="cmake"></code> -->
     <code><img height="20" src="https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white" alt="ubuntu" title="ubuntu"></code>
     <code><img height="20" src="https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black" alt="Linux" title="Linux"></code>
     <code><img height="20" src="https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white" alt="Win" title="Win"></code>
