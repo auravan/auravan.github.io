@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>五度圈 T(7,12) 环面纽结可视化</title>
+    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+    <style>
+        body { margin: 0; padding: 0; background-color: #1a1a1a; color: white; font-family: sans-serif; }
+        #plot { width: 100vw; height: 100vh; }
+        .info {
+            position: absolute; top: 20px; left: 20px;
+            background: rgba(0,0,0,0.7); padding: 15px;
+            border-radius: 8px; border: 1px solid #444;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="info">
+        <h2 style="margin:0">五度圈：T(7,12) 环面纽结</h2>
+        <p>这是一个 3D 拓扑模型：<br>
+           - <b>蓝色曲线</b>：十二平均律的频率演进路径<br>
+           - <b>彩色点</b>：对应的 12 个音级（按五度排列）<br>
+           - <b>旋转 12 次长轴 / 7 次短轴</b> 后闭合</p>
+    </div>
+
+    <div id="plot"></div>
+
+    <script>
+        const R = 2.5, r = 0.8; // 大径与小径
+        const p = 7, q = 12;    // 拓扑参数
+        const noteNames = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#', 'G#', 'D#', 'A#', 'F'];
+        const colors = ['#FF0000', '#FF6600', '#FFCC00', '#99FF00', '#00FF66', '#00FFFF', '#0066FF', '#6600FF', '#CC00FF', '#FF0099', '#FF0066', '#FF3333'];
+
+        // 1. 生成纽结轨迹线条数据
+        let t_line = [];
+        for (let i = 0; i <= 2000; i++) t_line.push((2 * Math.PI * i) / 2000);
+
+        let x_line = t_line.map(t => (R + r * Math.cos(p * t)) * Math.cos(q * t));
+        let y_line = t_line.map(t => (R + r * Math.cos(p * t)) * Math.sin(q * t));
+        let z_line = t_line.map(t => r * Math.sin(p * t));
+
+        const knotTrace = {
+            x: x_line, y: y_line, z: z_line,
+            type: 'scatter3d', mode: 'lines',
+            line: { color: '#4169E1', width: 6 },
+            name: '纽结路径', hoverinfo: 'none'
+        };
+
+        // 2. 生成音级点数据
+        let pointTraces = noteNames.map((name, i) => {
+            let t = (2 * Math.PI * i) / 12;
+            return {
+                x: [(R + r * Math.cos(p * t)) * Math.cos(q * t)],
+                y: [(R + r * Math.cos(p * t)) * Math.sin(q * t)],
+                z: [r * Math.sin(p * t)],
+                type: 'scatter3d', mode: 'markers+text',
+                marker: { color: colors[i], size: 8, line: { color: 'black', width: 2 } },
+                text: [name], textposition: 'top center',
+                name: '音级: ' + name,
+                hovertext: `音名: ${name}<br>八度跨度: ${Math.floor(i*7/12)}`,
+                hoverinfo: 'text'
+            };
+        });
+
+        // 3. 生成背景环面 (透明参考层)
+        let u_range = [], v_range = [];
+        for(let i=0; i<=40; i++) u_range.push(2*Math.PI*i/40);
+        for(let i=0; i<=20; i++) v_range.push(2*Math.PI*i/20);
+
+        let x_surf = [], y_surf = [], z_surf = [];
+        for(let v of v_range) {
+            let rowX = [], rowY = [], rowZ = [];
+            for(let u of u_range) {
+                rowX.push((R + r * Math.cos(v)) * Math.cos(u));
+                rowY.push((R + r * Math.cos(v)) * Math.sin(u));
+                rowZ.push(r * Math.sin(v));
+            }
+            x_surf.push(rowX); y_surf.push(rowY); z_surf.push(rowZ);
+        }
+
+        const torusTrace = {
+            x: x_surf, y: y_surf, z: z_surf,
+            type: 'surface', opacity: 0.1, showscale: false,
+            colorscale: [[0, '#888'], [1, '#888']],
+            name: '环面背景'
+        };
+
+        // 4. 渲染
+        const layout = {
+            paper_bgcolor: '#1a1a1a',
+            scene: {
+                xaxis: { visible: false },
+                yaxis: { visible: false },
+                zaxis: { visible: false },
+                aspectmode: 'data'
+            },
+            margin: { l:0, r:0, b:0, t:0 },
+            showlegend: false
+        };
+
+        Plotly.newPlot('plot', [knotTrace, torusTrace, ...pointTraces], layout);
+    </script>
+</body>
+</html>

@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="google-adsense-account" content="ca-pub-1217183586241699">
+  <meta name="baidu-site-verification" content="codeva-009XlqHtWl" />
+
+    
+
+  
+
+  <title>Judea Pearl boke - 李崎滨 | Arua Van</title>
+
+  <meta name="referrer" content="no-referrer">
+
+  <meta property="og:title" content="Judea Pearl boke - 李崎滨 | Arua Van">
+  <meta name="description" property="og:description" content="笔记">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="李崎滨的个人网站 | Build with Hugo">
+  <meta property="og:url" content="https://auravan.top/cn_aura/2026/01/jpb/">
+
+  
+  
+
+  
+  <meta name="author" property="article:author" content="李崎滨">
+  
+
+  
+  <meta name="date" property="article:published_time" content="2026-01-27" scheme="YYYY-MM-DD">
+  
+  
+  <meta name="date" property="article:modified_time" content="2026-01-27" scheme="YYYY-MM-DD">
+  
+
+  
+
+  <meta name="theme-color" content="#0d0d0d">
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/web/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/web/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="/images/web/favicon-48x48.png">
+  <link rel="icon" type="image/png" sizes="62x62" href="/images/web/favicon-62x62.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/images/web/favicon-192x192.png">
+  
+  <link rel="manifest" href="/manifest.json">
+    
+  
+
+  
+
+  <script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "BlogPosting",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://auravan.top/cn_aura"
+    },
+    "name": "Judea Pearl boke",
+    "headline": "Judea Pearl boke",
+    "description" : "笔记",
+    "genre": [
+      "math"
+    ],
+    "datePublished": "2026-01-27",
+    "dateModified": "2026-01-27",
+    "wordCount": "1362",
+    "keywords": [
+      
+    ],
+    "image": [
+      
+    ],
+    "author": {
+      "@type": "Person",
+      "name": "李崎滨"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "李崎滨",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://auravan.top/images/web/publisher-logo.png"
+      }
+    },
+    "url": "https://auravan.top/cn_aura/2026/01/jpb/"
+  }
+  </script>
+  
+
+  
+
+  
+
+
+
+<script>
+window.MathJax = {
+  loader: {
+    load: ['[tex]/boldsymbol']
+  },
+  tex: {
+    tags: "all",
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$']],
+    processEscapes: true,
+    processEnvironments: true,
+    packages: {
+      '[+]': ['boldsymbol']
+    }
+  },
+  options: {
+     
+    skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+  },
+  startup: {
+    ready: () => {
+      
+      MathJax.startup.defaultReady();
+      MathJax.startup.promise.then(() => {
+        console.log('MathJax initial typesetting complete');
+      });
+      
+      
+      const triggerRender = () => {
+        if (typeof MathJax.typesetPromise === 'function') {
+          MathJax.typesetPromise();
+        }
+      };
+
+      if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        triggerRender();
+      } else {
+        document.addEventListener('DOMContentLoaded', triggerRender);
+      }
+    }
+  }
+};
+</script>
+
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3.2/es5/tex-mml-chtml.js" crossorigin="anonymous"></script>
+
+
+<style>
+  mjx-container {
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    max-width: 100% !important;
+    padding: 0.5em 0;
+  }
+</style>
+
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/fonts.css">
+<link rel="stylesheet" type="text/css" href="/css/style.css">
+<link rel="stylesheet" type="text/css" href="/css/icons.css">
+<link rel="stylesheet" type="text/css" href="/css/print.css">
+
+
+<link rel="stylesheet" type="text/css" href="/css/donate.css">
+
+
+
+
+
+
+
+
+  </head>
+
+  
+  <body class="cn_aura">
+  <header class="masthead">
+    
+
+<div class="logo"><img src="/images/web/icon-512x512.png" alt="logo"></div>
+<p class="slogan">己所不欲，勿施于人</p>
+    <nav class="menu">
+  <ul>
+  
+  
+  
+    
+  
+  
+    <li><a href="/">首页</a></li>
+  
+    <li><a href="/cn_aura/">博客</a></li>
+  
+    <li><a href="/categories/">分类</a></li>
+  
+    <li class="menu-separator"><span>&nbsp;</span></li>
+  
+    <li><a href="/painting/">绘画</a></li>
+  
+    <li><a href="/cn/about/">关于</a></li>
+  
+    <li><a href="/cn/resume/">简历</a></li>
+  
+  
+  
+  
+    
+    <li class="menu-separator"><span>&nbsp;</span></li>
+    <li><a href="/cn_aura/index.xml" target="_blank" type="application/rss+xml">订阅</a></li>
+    
+  
+  <li class="theme-toggle no-border-bottom"><span id="theme-toggle-icon" class="material-symbols"></span></li>
+  </ul>
+</nav>
+
+  </header>
+
+  <article class="main">
+    <header class="content-title">
+    
+<h1 class="title">
+  
+  Judea Pearl boke
+  
+</h1>
+
+
+
+
+
+
+
+
+
+<h3 class="post-meta">
+
+
+<strong>分类: </strong>
+<a href="/categories/math">math</a>
+
+
+
+
+
+
+/
+
+
+<strong>字数: </strong>
+1362
+</h3>
+
+
+
+<hr>
+
+
+
+    
+    </header>
+
+
+
+
+<p>因果推断是一个重要的领域。但我对他的关注很少。一切起始于一个漫仕的视频，讲一些相关性和因果性的联系。再然后是Judea Pearl的播客。他得过图灵奖，他的儿子被
+这是Judea Pearl的播客阅读有感。</p>
+<link rel="stylesheet" href="/css/details-summary.css" />
+<details >
+  <summary>judea pearl说在图上增加越多的箭头，越不可能从纯粹的数据观察到事情。怎么理解。</summary>
+  <div class="detail-content">
+<p>这句话体现了 Judea Pearl（因果推论之父）最核心的哲学：“因果关系的识别，本质上是一场关于‘舍弃’的艺术。”在因果图（DAG）中，箭头代表你的先验假设（即你认为谁影响谁）。</p>
+<p>他的意思是：如果你假设一切皆有关联，你将无法从数据中通过统计手段分离出真正的因果效应。</p>
+<p>我们可以从以下三个层面来深度理解这个观点：</p>
+<ol>
+<li>
+<p>维度的诅咒：自由度与过拟合从纯数学角度看，图上的箭头越多，意味着模型中的参数（自由度）越多。全连通图的无力感：如果你在一个包含 A、B、C 的模型中画满了互相指向的箭头，这个模型就能完美解释数据中的任何相关性。代价：当一个模型能解释“一切”时，它就失去了“辨别”能力。由于路径太多，数据产生的信号会被分散到无数种可能的解释中，导致你无法确定具体的因果贡献到底来自哪一根箭头。</p>
+</li>
+<li>
+<p>“后门路径”的泛滥（因果阻断失败）Pearl 提出的 Back-door Criterion（后门准则） 是为了计算：在给定观测数据的情况下，$X$ 对 $Y$ 的真实影响是多少？箭头的本质是“污染”：每一个指向 $X$ 的箭头（来自混杂因子 $Z$），都可能开辟一条“后门路径”，让 $X$ 和 $Y$ 产生虚假的相关性。控制的困境：图上的箭头越多，潜在的混杂因子就越多。为了得到纯净的因果效应，你需要控制（层化/剔除）这些混杂因子的干扰。不可观测的死穴：一旦你增加了一个箭头指向 $X$ 和 $Y$，且对应的那个变量是不可观测的，你就彻底掉进了“不可识别（Unidentifiable）”的深渊——仅靠数据，你永远无法从干扰中剥离出因果。</p>
+</li>
+<li>
+<p>约束才是科学发现的前提Pearl 强调，科学的本质不在于你观察到了什么，而在于你排除了什么。没有箭头的意义：在因果图中，“缺失的箭头”比“存在的箭头”更有价值。缺失箭头代表一种独立性假设（即 A 不直接影响 B）。推论的支撑点：正是这些独立性假设，像“支架”一样撑起了整个数学推导过程。如果你把这些支架都拆了（加满了箭头），推导公式就会塌陷。</p>
+</li>
+<li>
+<p>形象的类比：多线索侦探想象你在调查一桩案件：情景 A：你认为只有三个嫌疑人，且他们之间没有串通。通过分析他们的不在场证明，你很快能锁定真凶。情景 B：你假设镇上所有 1000 个人都有作案动机，且每个人都可能和其他人秘密通信（加满了箭头）。结论：在情景 B 下，由于关系网太复杂，任何线索都可以被解释为“可能是某人帮某人做的”，最终你无法定任何人的罪。</p>
+</li>
+</ol>
+<p>总结</p>
+<p>Judea Pearl 的观点是在提醒我们：大数据本身是“愚蠢”的。如果缺乏对现实世界结构的稀疏性假设（即大胆断言某些事物之间没有因果关系），那么无论数据量多大，你看到的都只是相关性的迷雾，而非因果的真理。</p>
+<p>这和你之前研究的 Transformer 权重（$W_Q, W_K, W_V$）其实有异曲同工之妙：模型必须通过权重（甚至正则化）来让某些连接变弱、某些连接增强，才能从噪声中提取出有意义的模式。你想探讨一下因果图中的“结构化思维”如何帮助我们设计更好的 AI 架构吗？</p>
+</div>
+</details>
+<p>我需要深刻反省，我的一切皆有关联的假设，是否正确。我已经按照这个逻辑生存了很多年，事实上带来诸多困扰。</p>
+<p>he mention young people that : ask your problem.</p>
+
+
+
+
+
+<div class="donate">
+  <div class="donate-header"></div>
+  <div class="donate-slug" id="donate-slug">jpb</div>
+  <button class="donate-button">赞 赏</button>
+  <div class="donate-footer">「往来无百丁，请君备注留姓名（wx)」</div>
+</div>
+<div class="donate-modal-wrapper">
+  <div class="donate-modal">
+    <div class="donate-box">
+      <div class="donate-box-content">
+        <div class="donate-box-content-inner">
+          <div class="donate-box-header">「往来无百丁，请君备注留姓名（wx)」</div>
+          <div class="donate-box-body">
+            <div class="donate-box-money">
+              
+              
+            </div>
+            <div class="donate-box-pay">
+              <img class="donate-box-pay-qrcode" id="donate-box-pay-qrcode" src=""/>
+            </div>
+          </div>
+          <div class="donate-box-footer">
+            <div class="donate-box-pay-method donate-box-pay-method-checked" data-v="wechat-pay">
+              <img class="donate-box-pay-method-image" id="donate-box-pay-method-image-wechat-pay" src=""/>
+            </div>
+            <div class="donate-box-pay-method" data-v="alipay">
+              <img class="donate-box-pay-method-image"  id="donate-box-pay-method-image-alipay" src=""/>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button type="button" class="donate-box-close-button">
+      <svg class="donate-box-close-button-icon" fill="#fff" viewBox="0 0 24 24" width="24" height="24"><path d="M13.486 12l5.208-5.207a1.048 1.048 0 0 0-.006-1.483 1.046 1.046 0 0 0-1.482-.005L12 10.514 6.793 5.305a1.048 1.048 0 0 0-1.483.005 1.046 1.046 0 0 0-.005 1.483L10.514 12l-5.208 5.207a1.048 1.048 0 0 0 .006 1.483 1.046 1.046 0 0 0 1.482.005L12 13.486l5.207 5.208a1.048 1.048 0 0 0 1.483-.006 1.046 1.046 0 0 0 .005-1.482L13.486 12z" fill-rule="evenodd"></path></svg>
+    </button>
+  </div>
+</div>
+
+<script type="text/javascript" src="/js/donate.js"></script>
+
+
+  <footer>
+  
+<nav class="post-nav">
+  <span class="nav-prev">&larr; <a href="/cn_aura/2026/01/topology/">topology</a></span>
+  <span class="nav-next"></span>
+</nav>
+
+
+
+
+<script src='//cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js'></script>
+<script src="/js/toggle-theme.js"></script>
+
+
+<script src="/js/no-highlight.js"></script>
+<script src="/js/math-code.js"></script>
+<script src="/js/heading-anchor.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script async src="/js/center-img.js"></script>
+<script async src="/js/right-quote.js"></script>
+<script async src="/js/external-link.js"></script>
+<script async src="/js/alt-title.js"></script>
+<script async src="/js/figure.js"></script>
+
+
+
+<script src="//cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script>
+
+
+<script src="//cdn.jsdelivr.net/npm/vanilla-back-to-top@latest/dist/vanilla-back-to-top.min.js"></script>
+<script>
+addBackToTop({
+  diameter: 48
+});
+</script>
+
+  <hr>
+  <div class="copyright no-border-bottom">
+    <div class="copyright-author-year">
+      <span>Copyright &copy; 2024-2026 [李崎滨 | Aura Van]|您是第<span id='visit_count'>--</span>位访问者</span>
+    </div>
+  </div>
+  </footer>
+  </article>
+  </body>
+</html>
+<script>
+  
+  fetch('https://counter.auravan.top')
+    .then(response => response.text())
+    .then(count => {
+      document.getElementById('visit_count').innerText = count;
+    });
+</script>
+

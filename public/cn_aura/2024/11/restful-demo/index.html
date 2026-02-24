@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="google-adsense-account" content="ca-pub-1217183586241699">
+  <meta name="baidu-site-verification" content="codeva-009XlqHtWl" />
+
+    
+
+  
+
+  <title>restfulapi实战避坑指南 - 李崎滨 | Arua Van</title>
+
+  <meta name="referrer" content="no-referrer">
+
+  <meta property="og:title" content="restfulapi实战避坑指南 - 李崎滨 | Arua Van">
+  <meta name="description" property="og:description" content="restful-demo">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="李崎滨的个人网站 | Build with Hugo">
+  <meta property="og:url" content="https://auravan.top/cn_aura/2024/11/restful-demo/">
+
+  
+  
+
+  
+  <meta name="author" property="article:author" content="李崎滨">
+  
+
+  
+  <meta name="date" property="article:published_time" content="2024-11-29" scheme="YYYY-MM-DD">
+  
+  
+  <meta name="date" property="article:modified_time" content="2024-11-29" scheme="YYYY-MM-DD">
+  
+
+  
+  <meta name="keywords" property="article:tag" content ="restful,flask">
+  
+
+  <meta name="theme-color" content="#0d0d0d">
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/web/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/web/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="/images/web/favicon-48x48.png">
+  <link rel="icon" type="image/png" sizes="62x62" href="/images/web/favicon-62x62.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/images/web/favicon-192x192.png">
+  
+  <link rel="manifest" href="/manifest.json">
+    
+  
+
+  
+
+  <script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "BlogPosting",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://auravan.top/cn_aura"
+    },
+    "name": "restfulapi实战避坑指南",
+    "headline": "restfulapi实战避坑指南",
+    "description" : "restful-demo",
+    "genre": [
+      "demo"
+    ],
+    "datePublished": "2024-11-29",
+    "dateModified": "2024-11-29",
+    "wordCount": "723",
+    "keywords": [
+      "restful", "flask"
+    ],
+    "image": [
+      
+    ],
+    "author": {
+      "@type": "Person",
+      "name": "李崎滨"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "李崎滨",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://auravan.top/images/web/publisher-logo.png"
+      }
+    },
+    "url": "https://auravan.top/cn_aura/2024/11/restful-demo/"
+  }
+  </script>
+  
+
+  
+
+  
+
+
+
+<script>
+window.MathJax = {
+  loader: {
+    load: ['[tex]/boldsymbol']
+  },
+  tex: {
+    tags: "all",
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$']],
+    processEscapes: true,
+    processEnvironments: true,
+    packages: {
+      '[+]': ['boldsymbol']
+    }
+  },
+  options: {
+     
+    skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+  },
+  startup: {
+    ready: () => {
+      
+      MathJax.startup.defaultReady();
+      MathJax.startup.promise.then(() => {
+        console.log('MathJax initial typesetting complete');
+      });
+      
+      
+      const triggerRender = () => {
+        if (typeof MathJax.typesetPromise === 'function') {
+          MathJax.typesetPromise();
+        }
+      };
+
+      if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        triggerRender();
+      } else {
+        document.addEventListener('DOMContentLoaded', triggerRender);
+      }
+    }
+  }
+};
+</script>
+
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3.2/es5/tex-mml-chtml.js" crossorigin="anonymous"></script>
+
+
+<style>
+  mjx-container {
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    max-width: 100% !important;
+    padding: 0.5em 0;
+  }
+</style>
+
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/fonts.css">
+<link rel="stylesheet" type="text/css" href="/css/style.css">
+<link rel="stylesheet" type="text/css" href="/css/icons.css">
+<link rel="stylesheet" type="text/css" href="/css/print.css">
+
+
+<link rel="stylesheet" type="text/css" href="/css/donate.css">
+
+
+
+
+
+
+
+
+  </head>
+
+  
+  <body class="cn_aura">
+  <header class="masthead">
+    
+
+<div class="logo"><img src="/images/web/icon-512x512.png" alt="logo"></div>
+<p class="slogan">己所不欲，勿施于人</p>
+    <nav class="menu">
+  <ul>
+  
+  
+  
+    
+  
+  
+    <li><a href="/">首页</a></li>
+  
+    <li><a href="/cn_aura/">博客</a></li>
+  
+    <li><a href="/categories/">分类</a></li>
+  
+    <li class="menu-separator"><span>&nbsp;</span></li>
+  
+    <li><a href="/painting/">绘画</a></li>
+  
+    <li><a href="/cn/about/">关于</a></li>
+  
+    <li><a href="/cn/resume/">简历</a></li>
+  
+  
+  
+  
+    
+    <li class="menu-separator"><span>&nbsp;</span></li>
+    <li><a href="/cn_aura/index.xml" target="_blank" type="application/rss+xml">订阅</a></li>
+    
+  
+  <li class="theme-toggle no-border-bottom"><span id="theme-toggle-icon" class="material-symbols"></span></li>
+  </ul>
+</nav>
+
+  </header>
+
+  <article class="main">
+    <header class="content-title">
+    
+<h1 class="title">
+  
+  restfulapi实战避坑指南
+  
+</h1>
+
+
+
+
+
+
+
+
+
+<h3 class="post-meta">
+
+
+<strong>分类: </strong>
+<a href="/categories/demo">demo</a>
+
+
+
+
+/
+
+
+
+
+<strong>标签: </strong>
+<span>restful</span>, <span>flask</span>
+
+
+
+
+/
+
+
+<strong>字数: </strong>
+723
+</h3>
+
+
+
+<hr>
+
+
+
+    
+    </header>
+
+
+
+
+<h1 id="restfulapi-实战避坑指南">RESTFULAPI 实战避坑指南</h1>
+<p>文章基于这个<a href="https://docs.google.com/document/d/1v0l4TC2ZyFYyk6Y0ggFw86li2F6cwr5GLuTUyrzSpT4/edit?tab=t.0,%E4%B8%80%E4%B8%AArestfulapi%E7%9A%84%E5%B0%8Fdemo">内容</a>：
+学习过程中遇到如下问题：</p>
+<ul>
+<li>windows下venv环境激活涉及的powershell脚本权限</li>
+<li>flask相关命令行内容和上下文保持</li>
+</ul>
+<p>下面是对应内容的补充展开，方便大家根据上面内容学习：</p>
+<h2 id="winodws虚拟环境激活">winodws虚拟环境激活</h2>
+<p>注意windows环境下启用venv时候需要powershell的执行权限。参考https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-7.4#powershell-execution-policies
+PolicyName选择AllSigned或者其他合适的</p>
+<pre><code>Set-ExecutionPolicy -ExecutionPolicy &lt;PolicyName&gt;
+</code></pre>
+<h2 id="上下文保持细节">上下文保持细节</h2>
+<p>使用python代码调试falsk应用需要使得flask的环境在解释器中可访问，否则会出现outofcontext报错。使用 flask &ndash;app=application.py run以及 flask &ndash;app=application.py shell</p>
+<h1 id="实现了上述事情后你就可以体会到restfulapi的好处">实现了上述事情后你就可以体会到restfulapi的好处</h1>
+<p>在cmd中使用下列代码你就可以删除对应id的酒品（喝掉他）。</p>
+<pre><code>curl -X DELETE http://localhost:5000/drinks/1 
+
+</code></pre>
+<p>在cmd中使用下列代码你就可以新增内容字段。</p>
+<pre><code>curl -X POST http://localhost:5000/drinks \
+     -H &quot;Content-Type: application/json&quot; \
+     -d '{&quot;name&quot;: &quot;Your Drink Name&quot;, &quot;description&quot;: &quot;Your Drink Description&quot;}'
+</code></pre>
+<p>在flask上下文中使用Drink.query.all()或者实际访问对应资源的url就可以验证。确实是确实非常的amazing啊。</p>
+<p>flask源码参考（出处见上文链接）：</p>
+<pre><code>from flask import Flask, request
+from flask_sqlalchemy import SQLAlchemy
+app = Flask(__name__)
+
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
+db = SQLAlchemy(app)
+
+
+class Drink(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), unique=True, nullable=False)
+    description = db.Column(db.String(120))
+
+    def __repr__(self):
+        return f&quot;{self.name} - {self.description}&quot;
+
+
+@app.route('/')
+def index():
+    return 'Hello!'
+
+
+@app.route('/drinks')
+def get_drinks():
+    drinks = Drink.query.all()
+
+    output = []
+    for drink in drinks:
+        drink_data = {'name': drink.name, 'description': drink.description}
+
+        output.append(drink_data)
+
+    return {&quot;drinks&quot;: output}
+
+
+@app.route('/drinks/&lt;id&gt;')
+def get_drink(id):
+    drink = Drink.query.get_or_404(id)
+    return {&quot;name&quot;: drink.name, &quot;description&quot;: drink.description}
+
+
+@app.route('/drinks', methods=['POST'])
+def add_drink():
+    drink = Drink(name=request.json['name'],
+                  description=request.json['description'])
+    db.session.add(drink)
+    db.session.commit()
+    return {'id': drink.id}
+
+
+@app.route('/drinks/&lt;id&gt;', methods=['DELETE'])
+def delete_drink(id):
+    drink = Drink.query.get(id)
+    if drink is None:
+        return {&quot;error&quot;: &quot;not found&quot;}
+    db.session.delete(drink)
+    db.session.commit()
+    return {&quot;message&quot;: &quot;yeet!@&quot;}
+</code></pre>
+
+
+
+
+
+<div class="donate">
+  <div class="donate-header"></div>
+  <div class="donate-slug" id="donate-slug">restful-demo</div>
+  <button class="donate-button">赞 赏</button>
+  <div class="donate-footer">「往来无百丁，请君备注留姓名（wx)」</div>
+</div>
+<div class="donate-modal-wrapper">
+  <div class="donate-modal">
+    <div class="donate-box">
+      <div class="donate-box-content">
+        <div class="donate-box-content-inner">
+          <div class="donate-box-header">「往来无百丁，请君备注留姓名（wx)」</div>
+          <div class="donate-box-body">
+            <div class="donate-box-money">
+              
+              
+            </div>
+            <div class="donate-box-pay">
+              <img class="donate-box-pay-qrcode" id="donate-box-pay-qrcode" src=""/>
+            </div>
+          </div>
+          <div class="donate-box-footer">
+            <div class="donate-box-pay-method donate-box-pay-method-checked" data-v="wechat-pay">
+              <img class="donate-box-pay-method-image" id="donate-box-pay-method-image-wechat-pay" src=""/>
+            </div>
+            <div class="donate-box-pay-method" data-v="alipay">
+              <img class="donate-box-pay-method-image"  id="donate-box-pay-method-image-alipay" src=""/>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button type="button" class="donate-box-close-button">
+      <svg class="donate-box-close-button-icon" fill="#fff" viewBox="0 0 24 24" width="24" height="24"><path d="M13.486 12l5.208-5.207a1.048 1.048 0 0 0-.006-1.483 1.046 1.046 0 0 0-1.482-.005L12 10.514 6.793 5.305a1.048 1.048 0 0 0-1.483.005 1.046 1.046 0 0 0-.005 1.483L10.514 12l-5.208 5.207a1.048 1.048 0 0 0 .006 1.483 1.046 1.046 0 0 0 1.482.005L12 13.486l5.207 5.208a1.048 1.048 0 0 0 1.483-.006 1.046 1.046 0 0 0 .005-1.482L13.486 12z" fill-rule="evenodd"></path></svg>
+    </button>
+  </div>
+</div>
+
+<script type="text/javascript" src="/js/donate.js"></script>
+
+
+  <footer>
+  
+<nav class="post-nav">
+  <span class="nav-prev">&larr; <a href="/cn_aura/2024/10/whyrest2inweek/">为什么一周休息两天半</a></span>
+  <span class="nav-next"><a href="/cn_aura/2025/05/nand_thinking/">关于nand的思考</a> &rarr;</span>
+</nav>
+
+
+
+
+<script src='//cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js'></script>
+<script src="/js/toggle-theme.js"></script>
+
+
+<script src="/js/no-highlight.js"></script>
+<script src="/js/math-code.js"></script>
+<script src="/js/heading-anchor.js"></script>
+
+
+
+
+<script src="//cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/toolbar/prism-toolbar.min.js"></script>
+<script>
+  (function() {
+    if (!self.Prism) {
+      return;
+    }
+
+    
+    Prism.languages.dos = Prism.languages.powershell;
+    Prism.languages.gremlin = Prism.languages.groovy;
+
+    let languages = {
+      'apacheconf': 'Apache Configuration', 
+      'bash': 'Bash',
+      'c': 'C',
+      'css': 'CSS',
+      'cypher': 'Cypher',
+      'dos': 'DOS',
+      'gremlin': 'Gremlin',
+      'html': 'HTML',
+      'javascript': 'JavaScript',
+      'json': 'JSON', 
+      'latex': 'LaTeX',
+      'ngql': 'nGQL',
+      'powershell': 'PowerShell',
+      'python': 'Python',
+      'qml': 'QML',
+      'r': 'R',
+      'sh': 'Shell',
+      'shell': 'Shell',
+      'sparql': 'SPARQL',
+      'sql': 'SQL',
+      'tex': 'TeX',
+      'text': 'Text',
+      'txt': 'Text',
+      'xml': 'XML', 
+      'yaml': 'YAML',
+    };
+
+    Prism.hooks.add('before-highlight', function(env) {
+      if (env.language !== 'plain') {
+        let language = languages[env.language] || env.language;
+        env.element.setAttribute('data-language', language);
+      }
+    });
+
+    
+    let ClipboardJS = window.ClipboardJS || undefined;
+
+    Prism.plugins.toolbar.registerButton('copy-to-clipboard', function(env) {
+      let linkCopy = document.createElement('button');
+      linkCopy.classList.add('prism-button-copy');
+
+      registerClipboard();
+
+      return linkCopy;
+
+      function registerClipboard() {
+        let clip = new ClipboardJS(linkCopy, {
+          'text': function () {
+            return env.code;
+          }
+        });
+
+        clip.on('success', function() {
+          linkCopy.classList.add('prism-button-copy-success');
+          resetText();
+        });
+        clip.on('error', function () {
+          linkCopy.classList.add('prism-button-copy-error');
+          resetText();
+        });
+      }
+
+      function resetText() {
+        setTimeout(function () {
+          linkCopy.classList.remove('prism-button-copy-success');
+          linkCopy.classList.remove('prism-button-copy-error');
+        }, 1600);
+      }
+    });
+  })();
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script async src="/js/center-img.js"></script>
+<script async src="/js/right-quote.js"></script>
+<script async src="/js/external-link.js"></script>
+<script async src="/js/alt-title.js"></script>
+<script async src="/js/figure.js"></script>
+
+
+
+<script src="//cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script>
+
+
+<script src="//cdn.jsdelivr.net/npm/vanilla-back-to-top@latest/dist/vanilla-back-to-top.min.js"></script>
+<script>
+addBackToTop({
+  diameter: 48
+});
+</script>
+
+  <hr>
+  <div class="copyright no-border-bottom">
+    <div class="copyright-author-year">
+      <span>Copyright &copy; 2024-2026 [李崎滨 | Aura Van]|您是第<span id='visit_count'>--</span>位访问者</span>
+    </div>
+  </div>
+  </footer>
+  </article>
+  </body>
+</html>
+<script>
+  
+  fetch('https://counter.auravan.top')
+    .then(response => response.text())
+    .then(count => {
+      document.getElementById('visit_count').innerText = count;
+    });
+</script>
+

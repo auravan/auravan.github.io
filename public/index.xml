@@ -1,0 +1,570 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>李崎滨 | Aura Van on 李崎滨 | Arua Van</title>
+    <link>https://auravan.top/</link>
+    <description>Recent content in 李崎滨 | Aura Van on 李崎滨 | Arua Van</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Sun, 01 Sep 2024 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://auravan.top/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>我的音乐事业</title>
+      <link>https://auravan.top/music_all/</link>
+      <pubDate>Fri, 05 Dec 2025 00:00:00 +0000</pubDate>
+      
+      <guid>https://auravan.top/music_all/</guid>
+      <description>
+        <![CDATA[
+        <p>在正式了解音乐世界之前，你真的需要了解一些关键的概念。<a href="https://www.bilibili.com/video/BV1AfzmYjENv">泛音列</a>我不知道为什么我直到现在才highlight这个概念。<img src="/harmonylist.png" alt=""></p>
+<p>我想一路上你已经了解了足够多的音乐分析和代数运算，我需要向你隆重介绍音乐的几何学，Dmitri Tymoczko应该是当代的集大成者。他的</p>
+<p>你可以从最物理角度以及十二平均律的角度以及加法合成器的角度以及傅里叶分析的角度来理解音乐，甚至内蕴规律，这太关键了。</p>
+<ul>
+<li>
+<p><a href="/spiralchorddemov2/v121.html">spiralchrod最新进展</a>，项目使用spiralchord方法可视化以及记录和弦。</p>
+</li>
+<li>
+<p>理解<a href="/wudu4.html">真正的五度圈</a>,受到gemini提到的tonnetz启发，相关的进展首先来自对<a href="https://observablehq.com/@renatoppl/torus-knots">三叶结的研究</a>，其次来自我与deepseek对话音乐内几何-代数-分析时提到的Neo-Riemannian theory。里面环化的tonnetz令人遐想，由此引申。</p>
+</li>
+<li>
+<p>demo<a href="/spiralchorddemov2/index.html">网站</a>一个记录分析midi和弦的工具。</p>
+</li>
+</ul>
+<p>这是我写的音乐演奏家的markov图（随意填写，如果你按此模拟，练习，排练，演出的大概比例是2.5:1.6:5.8）</p>
+
+
+
+
+<div class="mermaid-wrapper center bordered shadow" >
+  <div class="mermaid">
+    
+graph LR
+%%Start([开始]) --> A((练习))
+    A((练习))
+    B((排练))
+    C((演出))
+%%    C --> D([结束])
+    E((探索其他音乐技术))
+    A -->|0.7| A
+    A -->|0.2| B
+    A -->|0.1| C
+    B -->|0.5| A
+    B -->|0.3| B
+    B -->|0.2| C
+    C -->|0.1| B
+    C -->|0.9| C
+    E
+    click A "https://auravan.top/music/music_train" "寻找好用的练习"
+    click C "https://auravan.top/music/music_show" "我的演出"
+    click E "https://auravan.top/music/music_tech" "音乐科技"
+
+  </div>
+</div>
+
+
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({ 
+    startOnLoad: true, 
+    theme: 'default',
+    flowchart: { useMaxWidth: true }
+  });
+</script>
+
+
+<p><strong>点击图像上的节点(除了排练，我真的很少做这件事)可以查看更多关于我的信息。</strong></p>
+<h2 id="探索音乐结构">探索音乐结构</h2>
+<p>关于我的大学论文，其实是一种对音乐结构的探索尝试。在看完<a href="https://www.bilibili.com/video/BV1Aj8DzzE42">真理元素的一期视频</a>后我意识到我当时做的事情就是markov所尝试做的一小部分。我甚至没有尝试连续分析两个音符，这实在是太糟糕了.<img src="/images/mail_to_SAITO.png" alt="这是曾经的一封邮件">幸运的是我发现我最近也开始同Ulam一样尝试玩一些纸牌游戏，比如三牌游戏。说不定我也能从中发掘一些真理。</p>
+<p>对音乐结构的理解，可以从乐理书中学到，也可以从ai大模型音乐生成的建模中学到。我最推荐你从https://www.hooktheory.com/ 学习具体歌曲的和弦进行，在billy joel she is always a woman这首<a href="https://www.hooktheory.com/theorytab/view/billy-joel/shes-always-a-woman#Chorus">具体的音乐</a>面前，你可以剖析他的和弦，欣赏历史上美妙的音乐。甚至从和弦复杂性对大量音乐排序检索。they really did a great job.但是后来我意识到，这首歌还有how deep is your love 是911事件为数不多的留存资料的背景音乐。</p>
+<p>横向切片：想象你在编辫子（纤维丛？maybe），你需要尽可能优美地编织线条，你可以和流苏一样加花。不同的轨道track就像织布机的不同轨道。需要合理的穿针引线。</p>
+<p>垂直切片：想象一个弹簧，弹簧上每周分布12个点，对应八度里的12个音。中间的2维n边形就是和弦。</p>
+<p>像素级别的分析是频谱分析，这是hz级别的分析。izotope可以做到。</p>
+<p>理论级别的分析是编曲，除了歌曲整体的结构（总谱），他还会教你怎么正确理解和使用效果器来达到目标效果，这就像shader之于计算机视觉。<a href="https://www.hooktheory.com/chordProgressionNode">这里</a>有大量流行歌的markov实例。所有你感兴趣的和弦进行应该都有。</p>
+<p>now with ai,目前的级别是token级别，每1ms都被分析成为一种可能的语句。</p>
+<p>如果是演奏家，那么你更关注指法如何排列才能更好地演奏曲谱。最近机器人弹钢琴好像挺流行，应该会有突破。</p>
+<h2 id="音乐的初始意志">音乐的初始意志</h2>
+<p>首先当然是好听，然后是自由，想去哪就去哪。音乐之树从人类深处扎根，由生命得以滋养。每一片叶子(某种markov链)都是一处风景。</p>
+<p>音乐最后的注意力应该在哪里，当然应该是作者本身的生平和成就以及不朽的作品，还有音乐交织起来的故事。</p>
+
+        
+        ]]>
+      </description>
+    </item>
+    
+    <item>
+      <title>有趣的事情</title>
+      <link>https://auravan.top/funstuff/</link>
+      <pubDate>Tue, 15 Oct 2024 00:00:00 +0000</pubDate>
+      
+      <guid>https://auravan.top/funstuff/</guid>
+      <description>
+        <![CDATA[
+        <p>此帖用于告诫自己 乱花渐欲迷人眼 追寻理想同时记得爱护自己和朋友。守护最亲爱的人。</p>
+<p>这是我的称骨诀：</p>
+<blockquote>
+<p>一身骨肉最清高 早入簧门姓氏标 待到年将三十六 蓝衫脱去换红袍</p>
+</blockquote>
+<p>网上摘了一处点评，所言非虚。</p>
+<blockquote>
+<p>此命为人品性刚直,做事公开有才能，不肯休息,六亲兄弟不得力,祖业无靠，白手成家立业,未运多驳杂,不能聚财，
+好一双抓钱手,没有一个赚钱斗,此命蜘蛛结网,朝圆夜不圆,做几番败几番,只能稳步成家计,谁知又被狂风吹,初限二十三四，犹如明月被云侵,三十外来恰是日头又重开，终交末运方为贵,渐渐荣昌盛.</p>
+</blockquote>
+<p>告诫自己:忌行动力差。优柔寡断，恃才傲物，官非纠纷，忌疾病劳累，失业。
+重积累，耕耘，厚积薄发。注意安排规划。</p>
+<p>你是intj,于职业旅程，你在那些充满挑战，能够激发你智慧潜能，让你尽情探索复杂难题的环境里，似飞鸟入林，蓬勃生长，如鱼得水。科学研究，软件开发，数据分析，哲学探究等领域，总是以其独特的魅力吸引着你，促使你运用那如同抽丝剥茧般严谨的逻辑思维和系统方法去深入钻研。你独具慧眼，洞若观火，善于察觉矛盾之处，构建理论模型，更能别出心裁，发掘他人忽视的创新之法。</p>
+<p>然而，于职业之途，并非时时风和日丽，亦有崎岖坎坷相伴。你兴趣广泛，厌恶按部就班，这或许会使你在选定方向前朝三暮四，辗转多个领域。你或许还会在工作日常的琐碎之事上犯难，诸如按时行事，应对职场纷争等。寻得一份既能激发智慧，又具灵活度以契合你工作方式的职位，是收获工作满足感，实现长期职业成就的关键。</p>
+<p>瑞达里欧说你是thinker，<a href="https://principlesyou.com/share/cHqlbVosfTxGWBI">这是你的报告</a></p>
+<p>你探寻更深层的意义
+审视、思考和理解复杂问题
+力求在决策中做到客观公正
+对新思想和观点持开放态度
+思考者成长需求</p>
+<p>但是你要学会果断决策，而不仅仅停留在想法和可能性层面。
+跟进想法和项目直至完成
+认识到情感（而不仅仅是批判性思维）在决策中的作用
+培养更有效的人际交往能力
+认识到并非每个人都能像他们那样进行深入或快速的思考。</p>
+
+        
+        ]]>
+      </description>
+    </item>
+    
+    <item>
+      <title>有趣的事情</title>
+      <link>https://auravan.top/mainstuff/</link>
+      <pubDate>Tue, 15 Oct 2024 00:00:00 +0000</pubDate>
+      
+      <guid>https://auravan.top/mainstuff/</guid>
+      <description>
+        <![CDATA[
+        <h1 id="funny-facts">funny facts</h1>
+<p>光华是由润泰集团投资，并且不只有北大光华管理学院。
+抽烟快感剖析。深呼吸本身就可以带来快感。</p>
+<h1 id="寻找意义-对抗荒诞">寻找意义，对抗荒诞</h1>
+<p>对抗荒诞的只能是更大的荒诞，对抗虚无的也只可能是更大的虚无。悖论背后的是更大的悖论。每一个小丑的背后是一个等待发现的马戏团。</p>
+<p>荒诞主义（法语：absurde；英语：absurdism），又译荒谬主义，哲学术语，字源是拉丁文的absurdus，意为音乐上的“不合调”，在存在主义中用来形容生命无意义、矛盾的、失序的状态。矛盾是失序的现象之一。</p>
+<p>我的同学安泽告诉我幸福也可以自己争取。</p>
+<p><a href="https://musicmap.info/">musicmap</a>:用于理解音乐历史结构的有趣玩意。</p>
+<p><a href="https://www.bilibili.com/video/BV1fq4y1g7hq/?spm_id_from=333.337.search-card.all.click&amp;vd_source=743607143c5aaf23f5d60644e3890025">极化码</a>：在历史这个无损压缩里你在哪个信道。</p>
+<p><a href="https://datatables.net/">DataTable</a>:谢益辉在<a href="https://yihui.org/en/2018/02/career-crisis/">回忆录</a>中提到js库</p>
+
+        
+        ]]>
+      </description>
+    </item>
+    
+    <item>
+      <title>中文博客</title>
+      <link>https://auravan.top/cn_aura/</link>
+      <pubDate>Mon, 09 Sep 2024 00:00:00 +0000</pubDate>
+      
+      <guid>https://auravan.top/cn_aura/</guid>
+      <description>
+        <![CDATA[
+        
+        
+        ]]>
+      </description>
+    </item>
+    
+    <item>
+      <title>钢琴的一种拓扑叶</title>
+      <link>https://auravan.top/research/</link>
+      <pubDate>Thu, 05 Sep 2024 12:00:00 +0000</pubDate>
+      
+      <guid>https://auravan.top/research/</guid>
+      <description>
+        <![CDATA[
+        <p><img src="/piano_surface.svg" alt=""></p>
+<p>本文提供了另一种有趣的分隔方式。将一个钢琴八度，即上图变为一片叶子。拓扑角度看非常直观，但是揭示了一些关于音律的规律。</p>
+<p><img src="/piano_leaf.jpg" alt=""></p>
+<p>一个钢琴图标有12个按键，7个白键，5个黑键。</p>
+<p>如果我们将白键以中间mi.fa中线为分隔，将7个白键分为3和4。将得到这个富有美感的分隔：12=3+4+5。</p>
+<pre><code>   oo | ooo                                         这是黑键
+  ooo | oooo                                        这是白键
+</code></pre>
+<p>如果我们往上补全，这就像是一个被稍微不对称切开的一个三角形：</p>
+<pre><code>      | #                                         以此类推（一个半音阶）
+    # | ##                                        以此类推（一个sus2和弦）
+   oo | ooo                                       这是黑键（一个五声音阶）
+  ooo | oooo                                      这是白键（一个大调音阶）
+ #### | #####
+##### | ######
+</code></pre>
+<p>参见下面的分析过程</p>
+<pre><code>o/1 = 2                                             八度切1刀分为2部分
+	 / \
+   o/2 o\3          2+3=5                           这两部分分别切2刀和3刀分为3部分和4部分
+   /     \
+ 'ooo'  'oooo'                                     
+
+</code></pre>
+<p>从对称角度看左边个数少了一个，把si放在左边</p>
+<pre><code>   # #    # # #
+7 1 2 3  4 5 6
+
+  oo    ooo
+o ooo   ooo                                         同时上移
+
+</code></pre>
+<p>得到下面的图示</p>
+<pre><code>
+ # # #    # # #  ................tp1.1
+  1 2 3  4 5 6
+</code></pre>
+<p>式tp1.1中，左上角#为主叶子（见后文），因此特标为$即:</p>
+<pre><code> $ # #    # # #  ................tp1.2
+  1 2 3  4 5 6
+</code></pre>
+<p>叶子$的左右位置直接决定了这个过程是否对称。
+如果认为在左边，则分解对称。如果在右，则为对称破缺（我知道这是一个看起来很草率的解释，我可能并不知道破缺的真正物理含义，但至少在这里用起来很合理）。</p>
+<p>我们将音程分解步骤对应下面的过程的一部分：</p>
+<pre><code>6=&amp;5················6分
+5=&amp;4················5分
+4=&amp;3................4分
+3=&amp;2................3分
+2=&amp;1................2分
+1=&amp;0················
+</code></pre>
+<p>这是一个不断向上生长的图式。应该也可以做拓展。</p>
+<!-- 
+猜测：这是一个三角阵或者更一般的对角阵。一个可逆矩阵A可以通过LU分解变成一个下三角矩阵L与一个上三角矩阵U的乘积。
+结合生命律动的规律，这可能是一个幂幺矩阵（unipotent matrix）。可以分解为单位矩阵加一个幂零矩阵（nilpotent matrix）。
+幂零矩阵的超对角线上移现象像极了音波的传递和消失的过程。
+
+考虑幂零矩阵的超对角线传播方式，以右上方为例。建模自然声场下的能量耗散，则应该设计下标大的为低频，因为对于有限矩阵来讲理论上有更长的留存时间。
+
+假设一个纯粹无谐波的440hz音频在自然声场下耗散，假设激发阵为无限大矩阵，以人耳可察范围为界，某hz单位音波强度传播至不可察觉所需要的计算步数矩阵为n,有A^n使得对应频率的无限激发阵列数据为0。
+
+实际角度考虑，n为计算分辨率，以44100hz为单位，对不同音符取各自n，记录相应频率分布即为单个音符的全部信息。
+
+对于一首歌，每个频率在每个合适窗口的分布情况，看情况记录信息，以44100hz为界，为录音文件。以音符为界，为乐队总谱。以歌为背景，存储歌之外人的信息。
+对于一个人，每个事件在每个合适窗口的分布情况，视情况记录信息，以日为界，为日记。以年为界，为生平。以人为背景，刻画人之外自然的进程。 -->
+<h1 id="关于生命和音乐">关于生命和音乐</h1>
+<blockquote>
+<p>据说大量关于生命过程的理论中，时间上的规则脉动都非常重要。</p>
+</blockquote>
+<p>对称的意义像折痕对于折纸，如果你对一个折叠起来的奇妙折纸感到好奇，最好的方式是尝试重新沿着折痕拆开然后复原它。</p>
+
+        
+        ]]>
+      </description>
+    </item>
+    
+    <item>
+      <title>Musics</title>
+      <link>https://auravan.top/music/</link>
+      <pubDate>Sun, 01 Sep 2024 00:00:00 +0000</pubDate>
+      
+      <guid>https://auravan.top/music/</guid>
+      <description>
+        <![CDATA[
+        
+        
+        ]]>
+      </description>
+    </item>
+    
+    <item>
+      <title>关于</title>
+      <link>https://auravan.top/cn/about/</link>
+      <pubDate>Sun, 01 Sep 2024 00:00:00 +0000</pubDate>
+      
+      <guid>https://auravan.top/cn/about/</guid>
+      <description>
+        <![CDATA[
+        <h1 id="我是谁">我是谁？</h1>
+<!-- <img src="/images/me/about-large.png" alt="李崎滨" width="200"> -->
+<p>我是<strong>李崎滨</strong>，可以叫我<strong>灵气</strong>或是 <strong>LeLE</strong>。如果想更多的了解我的工作和研究，请参见我的<a href="/cn/resume/">简历</a>页面，这个页面可以让你了解生活中的我。
+<picture></p>
+  <!-- <source type="image/webp" media="(min-width: 1200px)" srcset="/images/me/about-large.png"> -->
+  <!-- <source type="image/webp" media="(min-width: 800px)" srcset="/images/me/about-large.png"> -->
+  <!-- <source type="image/webp" srcset="/images/me/about-small.about-large.png"> -->
+  <!-- <source media="(min-width: 1200px)" srcset="/images/me/about-small-lqb.png">
+  <source media="(min-width: 800px)" srcset="/images/me/about-small-lqb.png">
+  <img src="/images/me/about-large.png" alt="李崎滨"> -->
+</picture>
+<h1 id="喜欢啥">喜欢啥？</h1>
+<p>喜欢遍历探索发现，重建连接。还有尊重和发现命运。
+玩游戏（我有些倦了，可能是时候写一个自己的游戏，运动现在对我来说更有吸引力），看代码还有创造。
+可能我需要一个projectlist，在这个ai时代创造并不难。</p>
+<h2 id="音乐">音乐</h2>
+<blockquote>
+<p>血泪纷争后的生命，乘歌来，随风走。</p>
+</blockquote>
+<p>这是我的音乐歌单：
+<a href="https://y.music.163.com/m/playlist?app_version=8.9.95&amp;id=2342135646&amp;userid=1539233686&amp;dlt=0846&amp;creatorId=1539233686">灵气Van喜欢的音乐</a> 我很久没有更新，因为我总是用b站。我的b站动态现在充满了suno唱的歌。</p>
+<p>最近喜欢：<a href="https://www.bilibili.com/video/BV1weW1eDEWn">《勿听》</a> /ai陶喆-《泪桥》《一口》</p>
+<h2 id="书籍">书籍</h2>
+<blockquote>
+<p>黄金屋，千钟黍，颜如玉</p>
+</blockquote>
+<p>《为什么伟大不能被计划》&ndash;从最古老的智慧到最新的研究（智慧的闭环）。</p>
+<p>《道德经》&ndash;处众人之所恶，故几于道。人之所恶，无非鳏寡不谷。</p>
+<h2 id="影视">影视</h2>
+<blockquote>
+<p>要我说人的大脑内视觉皮层还是太多了（但是大模型可能最后变成纯视觉模型2025我才意识到）</p>
+</blockquote>
+<p>2025《时光倒流七十年》- 源自一首经典情歌The one you love</p>
+<p>2022《苍兰诀》-近年唯一看过的电视剧。我的眼睛被屏幕伤透了，还不近视，其实并不是好事。我不想事事看的那么清楚。这让我疲惫。</p>
+
+        
+        ]]>
+      </description>
+    </item>
+    
+    <item>
+      <title>简历</title>
+      <link>https://auravan.top/cn/resume/</link>
+      <pubDate>Sun, 01 Sep 2024 00:00:00 +0000</pubDate>
+      
+      <guid>https://auravan.top/cn/resume/</guid>
+      <description>
+        <![CDATA[
+        <h1 id="李崎滨">李崎滨</h1>
+<h1 id="研究兴趣"><span class="material-symbols material-symbols-target-outline"></span> 研究兴趣</h1>
+<ul>
+<li>现从事<strong>数据分析</strong>相关工作。</li>
+<li>对<strong>音乐科技</strong>领域的应用充满兴趣。</li>
+</ul>
+<h1 id="教育背景"><span class="material-symbols material-symbols-school-outline"></span> 教育背景</h1>
+<ul>
+<li>2019.09 ~ 2023.07 <strong>中国民航大学</strong> 统计学 学士</li>
+<li>2021 ~ 2022 <strong>中国传媒大学</strong> 录音艺术 辅修</li>
+</ul>
+<h1 id="工作经历"><span class="material-symbols material-symbols-groups-outline"></span> 工作经历</h1>
+<ul>
+<li>2025.10 ~ 2025.11 <strong>渔喵网络</strong> unity工程师</li>
+<li>2024.08 ~ 2025.08 <a href="https://www.moredian.com/#"><strong>魔点科技</strong></a>初级产品经理</li>
+<li>2024.03 ~ 2024.06 <a href="https://www.asktable.com"><strong>DataMini</strong></a>初级程序员</li>
+</ul>
+<h1 id="项目经历"><span class="material-symbols material-symbols-list-alt-outline"></span> 项目经历</h1>
+<!-- ## 安全和风险
+
+_2020.08 ~ 至今 风险数据挖掘专家_ -->
+<h2 id="计算机视觉">计算机视觉</h2>
+<p><em>2024.02 ~ 2024.02 落地交付</em></p>
+<ul>
+<li><strong>姿态估计解决方案</strong>：<strong>从0-1</strong>理解了用户需求，完成了<a href="https://openmmlab.com/">openmmlab</a>的MMpose姿势关节检测算法部署。</li>
+</ul>
+<h2 id="算法应用">算法应用</h2>
+<p><em>2023.07 ~ 2024.07 数据分析兼职</em></p>
+<ul>
+<li><strong>人工湖选址</strong>：依据GIS系统的地表热量遥感信息，应用K-means提供新增湖南省适宜水体地点参考并作可视化。</li>
+</ul>
+<!-- - **智能环控**：设计和实现了基于时间序列分析，深度学习和强化学习智能环控算法和解决方案。将智能环控算法拆解为环境模型和控制模型两部分，实现了同一作物和家畜在不同环境下种养殖模型的复用。通过专家知识引擎和机器学习算法实现了在保持现有产量不变的前提下各项环境指标控制误差相比于人工降低了 **50%+**，整体平均成本（水，电，肥等）降低 **20%+**。参加 2019 年国际智慧温室种植挑战赛，在 24 小时 Hackathon 模拟挑战赛中，获得人工智能策略方法 **4/21** 名，虚拟西红柿种植净利润 **9/21** 名。
+- **智能集蛋**：设计和实现了一套基于计算机视觉和 IoT 传感器的智能集蛋装置和算法。在笼养模式集蛋过程中，利用摄像头和 IoT 传感器采集的数据实现了鸡蛋计数和隶属笼体的识别，准确率 **99%+**。通过鸡蛋隶属笼体识别可以精准分析不同笼体内的料蛋比，为淘汰鸡提供强有力的数据支持，同时也为蛋品的溯源提供了更细力度的数据。 -->
+<!-- ## Daat (复杂网络和知识图谱)
+
+_2018.04 ~ 2019.06 项目负责人_
+
+- **数据知识工程和知识问答系统**：设计和构建数据仓库，数据集市和数据工具领域的知识本体，并据此进行知识抽取和知识库构建。设计和实现了数据知识问答系统，包括：用户问题意图识别，槽填充，查询改写，结果排序以及基于深度语义模型的问题匹配。问答系统主要用于辅助数据使用者对于仓库和集市数据的查询使用，以及相关概念、流程、工具等方面问题的解答。系统服务内部 **3000+** 用户，数据相关问题咨询人工解答量降低 **50%+**。
+- **自动化敏感信息识别**：对于入库到数据仓库中的数据进行自动敏感信息识别，辅助数据加密策略实施。根据数据的元信息 (例如：表名，表注释，字段名，字段注释等) 和值信息 (即字段存储的数据值)，利用 Wide & Deep 网络构建识别模型。提取传统特征构建 Wide 网络，针对文本特征，利用 Char Embedding + CNN 构建 Deep 网络，模型测试数据的 F1-Score 为 **0.95+**。
+- **大规模异构网络嵌入**：实现针对**千万级别顶点**和**亿级别边**的异构网络嵌入算法。通过 Alias 方法进行高效地加权节点采样，实现了基于具有丰富业务含义元路径 (Meta-Path) 和其他算法的网络节点嵌入。利用异构网络节点嵌入结果作为节点特征 (例如：用户，商品等) 为风控，营销和推荐等业务模型和系统提供服务。
+- **基于用户网络和用户行为的推荐和营销**：通过用户的历史购买记录构建包含用户，商品 (实物，理财等) 等多类型节点和边的异构网络，并利用异构网络嵌入算法构建不同类型节点的向量表示。结合用户传统特征和用户在线行为，构建推荐候选结果生成和营销人群生成模型，结合最终业务模型，平均辅助提升效果 **20%+**。 -->
+<!-- ## 全视之眼 (中文地址分析)
+
+_2015.04 ~ 2018.04 项目负责人_
+
+- **地址分析算法引擎**：设计和开发中文地址分词，分类，完整度，POI 识别，相似度等基础算法和服务，算法平均准确率 **90%+**。
+- **地址画像系统**：依托地址分析算法引擎，设计地址 POI。 画像相关指标体系，存储和服务框架。对内，服务于线下支付等场景下的营销和运营，平均提升用户转化率 **30%+**；对外，接入京东金融稻田等平台，提供精确查询，模糊查询和经纬度范围查询等多种查询方式，实现金融科技的对外输出。
+- **授信和反欺诈模型**：依据地址画像构建授信策略，辅筛选和授信用户超过 **1000 万人**。依托地址分析算法和地址画像，构建中介识别等反欺诈模型，识别套现订单金额约 **20 万元/日**。
+- 全视之眼项目斩获 2017 年度京东集团京芽杯创新大赛 **“创新种子奖”**，排名 **20/378**。
+- **企业地址画像系统**：构建企业、地址和用户关系，设计企业地址画像相关指标体系，服务于 [**京东企业信用**](https://icredit.jd.com/)，对内外部提供离线数据和实时查询服务。
+- **农村金融小站选址模型**：根据地址画像系统，结合农村金融相关业务，构建基于地址画像的农村金融小站选址模型和系统，为农村金融小站的线下选址提供辅助决策。 -->
+<!-- ## 用户行为分析
+
+_2017.10 ~ 2017.12 算法设计和开发_
+
+- 设计开发了一种 Behavior2Vec 用户行为表示方法，基于层次聚类和深度搜索，构建了一个用于识别用户异常行为的混合模型。在校园白条中介激活和账号盗用问题上，相比传统的 Bag of Words 和 N-GRAM 等表示方法，在保证**准确率 80%+** 的前提下，提高异常用户识别数量 **3+ 倍**。 -->
+<!-- ## 动产融资
+
+_2015.04 ~ 2015.10 算法设计和开发_
+
+- 设计开发一种基于 Bass 扩散模型，优化的时间序列相似度和聚类算法的混合产品生命周期识别模型，尾货识别**准确率 95%+**，辅助贷款方商品质押准入决策和质押率的制定。
+- 设计开发不同数据源的商品信息融合模型，相同商品识别**准确率 90%+**，配合 ElasticSearch 开发商品模糊匹配查询服务，为商品质押提供精准的价格等相关信息。
+
+# <span class="material-symbols material-symbols-settings-outline"></span> 专业技能 -->
+<h2 id="开发语言">开发语言</h2>
+<ul>
+<li><i class="icon icon-python">Python</i>: <span class="material-symbols material-symbols-star-fill"></span><span class="material-symbols material-symbols-star-fill"></span><span class="material-symbols material-symbols-star-outline"></span><span class="material-symbols material-symbols-star-outline"></span><span class="material-symbols material-symbols-star-outline"></span></li>
+<li><i class="icon icon-r">R</i>: <span class="material-symbols material-symbols-star-fill"></span><span class="material-symbols material-symbols-star-fill"></span><span class="material-symbols material-symbols-star-outline"></span><span class="material-symbols material-symbols-star-outline"></span><span class="material-symbols material-symbols-star-outline"></span></li>
+<li><i class="icon icon-java">Java</i>: <span class="material-symbols material-symbols-star-fill"></span><span class="material-symbols material-symbols-star-outline"></span><span class="material-symbols material-symbols-star-outline"></span><span class="material-symbols material-symbols-star-outline"></span><span class="material-symbols material-symbols-star-outline"></span></li>
+</ul>
+<!-- - <i class="icon icon-rust">Rust</i>: <span class="material-symbols material-symbols-star-fill"></span><span class="material-symbols material-symbols-star-fill"></span><span class="material-symbols material-symbols-star-outline"></span><span class="material-symbols material-symbols-star-outline"></span><span class="material-symbols material-symbols-star-outline"></span> -->
+<h2 id="平台框架">平台框架</h2>
+<ul>
+<li><i class="icon icon-pytorch">PyTorch</i>: <span class="material-symbols material-symbols-star-fill"></span><span class="material-symbols material-symbols-star-outline"></span><span class="material-symbols material-symbols-star-outline"></span><span class="material-symbols material-symbols-star-outline"></span><span class="material-symbols material-symbols-star-outline"></span></li>
+</ul>
+<!-- - <i class="icon icon-spark">Spark</i>: <span class="material-symbols material-symbols-star-fill"></span><span class="material-symbols material-symbols-star-fill"></span><span class="material-symbols material-symbols-star-fill"></span><span class="material-symbols material-symbols-star-outline"></span><span class="material-symbols material-symbols-star-outline"></span>
+- <i class="icon icon-qt">Qt</i>: <span class="material-symbols material-symbols-star-fill"></span><span class="material-symbols material-symbols-star-fill"></span><span class="material-symbols material-symbols-star-fill"></span><span class="material-symbols material-symbols-star-outline"></span><span class="material-symbols material-symbols-star-outline"></span>
+- <i class="icon icon-react">React</i>: <span class="material-symbols material-symbols-star-fill"></span><span class="material-symbols material-symbols-star-fill"></span><span class="material-symbols material-symbols-star-outline"></span><span class="material-symbols material-symbols-star-outline"></span><span class="material-symbols material-symbols-star-outline"></span> -->
+<h2 id="外语能力">外语能力</h2>
+<ul>
+<li>英语: CET6 476(记不太清了)，能说，会用</li>
+</ul>
+<h1 id="研究成果"><span class="material-symbols material-symbols-award-star-outline"></span> 研究成果</h1>
+<!-- ## 论文 -->
+<!-- 1. Zhou, F., Yin, H., Zhan, L., Li, H., **Fan, Y.**, & Jiang, L. (2018). A Novel Ensemble Strategy Combining Gradient Boosted Decision Trees and Factorization Machine Based Neural Network for Clicks Prediction. In _2018 International Conference on Big Data and Artificial Intelligence (BDAI)_ (pp. 29-33). IEEE. -->
+<!-- ## 专利
+- 利不了一点：我发现的这种东西真的能赚钱吗.. -->
+<!-- 1. 一种中文地址分词方法及系统 (发明，[CN 105159949](http://epub.cnipa.gov.cn/patent/CN105159949B)，**授权**，第一发明人，2015) -->
+<h2 id="其它链接">其它链接</h2>
+<!-- - **技术主页**：[https://auravan.tech](https://aruavan.tech) -->
+<ul>
+<li><strong>Github</strong>: <a href="https://github.com/auravan">https://github.com/auravan</a> <img src="https://img.shields.io/github/followers/auravan?style=social&amp;label=Follow" alt="github-followers"></li>
+<li><strong>LeetCode</strong>:<a href="https://leetcode.cn/u/aura_van/">https://leetcode.cn/u/aura_van/</a></li>
+<li><strong>BillBill</strong>:<a href="https://space.bilibili.com/28567547">https://space.bilibili.com/28567547</a></li>
+</ul>
+<!-- 1. [R 语言数据科学导论](https://ds-r.leovan.tech)：一份以 R 语言为基础的数据科学入门教程。![github-stars](https://img.shields.io/github/stars/leovan/data-science-introduction-with-r.svg?style=social&label=Stars)s
+2. [Python 数据科学导论](https://ds-python.leovan.tech)：一份以 Python 为基础的数据科学入门教程。![github-stars](https://img.shields.io/github/stars/leovan/data-science-introduction-with-python.svg?style=social&label=Stars)
+3. [Sci-Hub EVA](https://github.com/leovan/SciHubEVA)：Sci-Hub EVA 是一个跨平台的 Sci-Hub 界面化应用。![github-stars](https://img.shields.io/github/stars/leovan/SciHubEVA.svg?style=social&label=Stars)
+4. [中文 Duckling](https://github.com/leovan/duckling-chinese)：中文 Duckling 是基于 Jpype1 的 [duckling-fork-chinese](https://github.com/XiaoMi/MiNLP/tree/main/duckling-fork-chinese) 的 Python 封装版本，提供例如时间、日期、数字等中文解析服务。![github-stars](https://img.shields.io/github/stars/leovan/duckling-chinese.svg?style=social&label=Stars)
+5. [Hive 函数](https://hive-functions.leovan.tech)：实用自定义 Hive 函数集。 ![github-stars](https://img.shields.io/github/stars/leovan/hive-functions.svg?style=social&label=Stars)
+6. [Cytoscape 中文用户手册](https://cytoscape.leovan.tech)：Cytoscape 中文用户手册。 ![github-stars](https://img.shields.io/github/stars/leovan/cytoscape-manual.svg?style=social&label=Stars)
+7. [Rasa 中文文档](https://rasa.leovan.tech)：Rasa 中文文档。 ![github-stars](https://img.shields.io/github/stars/leovan/rasa-doc.svg?style=social&label=Stars)
+8. [Quarto 伪代码扩展](https://github.com/leovan/quarto-pseudocode)：一个用于在 `html` 和 `pdf` 文档中渲染伪代码的 Quarto 扩展。![github-stars](https://img.shields.io/github/stars/leovan/quarto-pseudocode.svg?style=social&label=Stars)
+9. [Quarto 水印扩展](https://github.com/leovan/quarto-watermark)：一个用于在 `html` 和 `pdf` 文档中添加水印的 Quarto 扩展。![github-stars](https://img.shields.io/github/stars/leovan/quarto-watermark.svg?style=social&label=Stars)
+10. [Quarto 样式文本扩展](https://github.com/leovan/quarto-style-text)：一个用于在 `html` 和 `pdf` 文档中渲染样式文本的 Quarto 扩展。![github-stars](https://img.shields.io/github/stars/leovan/quarto-style-text.svg?style=social&label=Stars)
+
+<h2 style="text-align: right;"><a href="//cdn.leovan.me/documents/cv/FanYeliang-CV-zh.pdf" target="_blank" style="border: none;">离线版本 <span class="material-symbols material-symbols-download-outline"></span></a></h2>
+
+<p class="kai" style="text-align: right;">更新于：2024-02-26</p> -->
+
+        
+        ]]>
+      </description>
+    </item>
+    
+    <item>
+      <title>摄影</title>
+      <link>https://auravan.top/photography/</link>
+      <pubDate>Fri, 15 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://auravan.top/photography/</guid>
+      <description>
+        <![CDATA[
+        <p>2025年12月我回到初中母校，见到了阔别多年的，看我从小长大的美术老师廖茂桥，他教授书法，篆刻，国画，陶艺。他的<a href="https://tuchong.com/311685/">摄像作品</a>多在章旦乡拍摄。我直观理解了生活中不缺少美，而缺乏发现美的眼睛这件事。短暂的重逢，他带我看了很多<a href="https://space.bilibili.com/1006125507">ThomasHeaton</a>的纪录片。等缪老师退休之后我应该有机会和他一起出门走走。</p>
+
+        
+        ]]>
+      </description>
+    </item>
+    
+    <item>
+      <title>绘画</title>
+      <link>https://auravan.top/painting/</link>
+      <pubDate>Fri, 15 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://auravan.top/painting/</guid>
+      <description>
+        <![CDATA[
+        <h2 class="center no-anchor"> 「我的人生创作」</h2>
+<h1 id="2024">2024</h1>
+
+  
+
+
+
+  
+
+
+
+
+
+<div class="gallery" shortcode="gallery" id="gallery-1" data="/data/painting/202.json"></div>
+<h1 id="2023">2023</h1>
+
+
+
+  
+
+
+
+
+
+<div class="gallery" shortcode="gallery" id="gallery-2" data="/data/painting/2023.json"></div>
+
+        
+        ]]>
+      </description>
+    </item>
+    
+    <item>
+      <title>English Blogs</title>
+      <link>https://auravan.top/en/</link>
+      <pubDate>Mon, 04 Dec 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://auravan.top/en/</guid>
+      <description>
+        <![CDATA[
+        
+        
+        <script>location.href='https://auravan.top/en/';</script>
+        
+        ]]>
+      </description>
+    </item>
+    
+    <item>
+      <title>书籍</title>
+      <link>https://auravan.top/books/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://auravan.top/books/</guid>
+      <description>
+        <![CDATA[
+        <h1 id="等待阅读">等待阅读</h1>
+<p>《数学与想象》（Mathematics and the Imagination）</p>
+<p>by 爱德华·卡斯纳（Edward Kasner）和詹姆斯·纽曼（James Newman）</p>
+<pre><code>--googol的起源
+</code></pre>
+<h1 id="已经阅读">已经阅读</h1>
+
+        
+        ]]>
+      </description>
+    </item>
+    
+    <item>
+      <title>绘画</title>
+      <link>https://auravan.top/cooking/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://auravan.top/cooking/</guid>
+      <description>
+        <![CDATA[
+        <h2 class="center no-anchor">  「唯有爱与美食，不可辜负。」</h2>
+<h1 id="2022">2022</h1>
+
+  
+
+
+
+  
+
+
+
+
+
+<div class="gallery" shortcode="gallery" id="gallery-1" data="/data/cooking/2022.json"></div>
+<h1 id="2017">2017</h1>
+
+
+
+  
+
+
+
+
+
+<div class="gallery" shortcode="gallery" id="gallery-2" data="/data/cooking/2017.json"></div>
+
+        
+        ]]>
+      </description>
+    </item>
+    
+  </channel>
+</rss>

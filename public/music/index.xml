@@ -1,0 +1,118 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Musics on 李崎滨 | Arua Van</title>
+    <link>https://auravan.top/music/</link>
+    <description>Recent content in Musics on 李崎滨 | Arua Van</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Sun, 01 Sep 2024 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://auravan.top/music/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>演出记录</title>
+      <link>https://auravan.top/music/music_show/</link>
+      <pubDate>Sun, 01 Sep 2024 00:00:00 +0000</pubDate>
+      
+      <guid>https://auravan.top/music/music_show/</guid>
+      <description>
+        <![CDATA[
+        <p>好的演出需要好的听众和好的舞台，好的乐手。</p>
+<p>我的音乐演出从小由曾祥勇老师带着我，他是一位很好的古筝老师。我曾经和另一位老师学过一小段时间黑管。
+印象里最后一次演出没有成功是因为我讨厌他选的歌曲，然后我练了几次，当着他的面自己跑掉以示抗议。</p>
+<p>类似这样的事情后来发生过很多次，我认为不够完美的演出都会被我亲手否定，即使这带来痛苦，不论对我还是同事朋友。
+但是偶尔我发现观众比我想象中更加宽容，他们的宽容和微笑是我最大的舞台。</p>
+<h1 id="演出-表演和当听众都算-记录">演出（表演和当听众都算）记录</h1>
+<p>大学期间，有3次上台，一次感觉并不好，是林俊杰的当你，弹崩了。另一首是456的一个进行的欧美金曲，想不起来了。还有一次我都也想不起来了。我们的乐队叫折耳根。</p>
+<p>2023年毕业后，县里有个青春有点甜的演出活动，其实我感觉青春很苦涩。我后来去唱了，我爸把视频放在朋友圈置顶，我觉得我的表情和肢体动作很不ok，而且忘词。现在我已经让他撤下了。你可以在wechat搜到。</p>
+<p>2025年9月，我从破败的杭州某服装百货淘到一台roland cube,随后我在杭州efc繁华的夜市上独自唱歌。保安小哥为我录制了男孩这首歌。一个女孩点了很多林俊杰的歌，她最后送我一朵布制的花。</p>
+<p>2025年11月，浙大管院金色大厅。我亲自动身给3年未见的白月光送了一捧香槟玫瑰。她穿着黑色礼服演奏钢琴，我在谢幕的时候送了花，我没怎么欣赏音乐。我只知道当音乐暂停，台下响起掌声的时候，我应该上去送花，仅此而已。（玉泉永谦礼堂有一场新年演出，不过那场摄影师没有把她拍的很好看）</p>
+<p>2025年12月，我在章旦的排练室里弹奏钢琴，有两首我很满意，成都和花开忘忧。没有固定的听众，大家都很忙。但我想不止我一个人哭了。那天恰逢老师选拔小朋友们的元旦演出节目，那也是我的来路。</p>
+<p>2026年1月，我去安泽同学家里，演奏了一些简单的歌曲，他会轻声附和。也可算是可以弹素琴。</p>
+<h1 id="演出设备列表">演出设备列表</h1>
+<ul>
+<li>我擅长唱歌，但是唱的越来越少，现在在我眼里它只是个求偶工具。</li>
+<li>我会弹点键盘（NI A61）自娱自乐，</li>
+<li>有台rc505（你可以看陶喆的一个<a href="https://www.bilibili.com/video/BV1t7411j7cs?spm_id_from=333.788.videopod.episodes&amp;vd_source=743607143c5aaf23f5d60644e3890025&amp;p=6">抽象演出</a>来了解这个东西），</li>
+<li>一对真力8010音响</li>
+<li>一台roland cube street ex户外音响（吃灰中）</li>
+</ul>
+
+        
+        ]]>
+      </description>
+    </item>
+    
+    <item>
+      <title>音乐科技</title>
+      <link>https://auravan.top/music/music_tech/</link>
+      <pubDate>Sun, 01 Sep 2024 00:00:00 +0000</pubDate>
+      
+      <guid>https://auravan.top/music/music_tech/</guid>
+      <description>
+        <![CDATA[
+        <p>主题很宏大，我只介绍我能介绍的。</p>
+<ul>
+<li>音乐下载and解密，一个<a href="https://demo.unlock-music.dev/">网站</a></li>
+<li>音轨提取分离，<a href="https://www.lalal.ai/">这个</a>，下载推荐使用chrome插件，在线录音器。</li>
+<li>钢琴音频转midi，此技术正在群雄争霸，蓬勃发展。推荐使用huggingface上的模型。目前效果其实很有限。</li>
+</ul>
+
+        
+        ]]>
+      </description>
+    </item>
+    
+    <item>
+      <title>音乐练习题</title>
+      <link>https://auravan.top/music/music_train/</link>
+      <pubDate>Sun, 01 Sep 2024 00:00:00 +0000</pubDate>
+      
+      <guid>https://auravan.top/music/music_train/</guid>
+      <description>
+        <![CDATA[
+        <h1 id="练习题">练习题：</h1>
+<ol>
+<li>《明天过后》的前奏：F调1-3b-4-1.右手旋律1345为Cadd11.</li>
+<li>默写5度，4度圈。默写各调251。</li>
+<li>从大模型的训练方式得到灵感，需要尝试音乐版本的完型填空。and you need huge sample and the analysis and generate attempts of that.比如小星星旋律：11556654433221，如果挖空可以怎么填写。1_____5,4_____1;</li>
+<li><a href="https://www.hooktheory.com/theorytab/view/lupe-fiasco/the-show-goes-on?node=1.56.6#chorus">https://www.hooktheory.com/theorytab/view/lupe-fiasco/the-show-goes-on?node=1.56.6#chorus</a> 总结这段和弦进行：多以第二转位为主，</li>
+<li>每个旋律对应一个独特的markov chain，需要熟悉这个状态转移。训练弹奏音阶，以Cmaj为例。上行则
+
+
+
+
+<div class="mermaid-wrapper " >
+  <div class="mermaid">
+    
+graph LR
+    A((弹C))
+    B((弹E))
+    C((弹G))
+
+    A -->|1|B
+    B -->|1|C
+    C -->|1|A 
+
+  </div>
+</div>
+
+
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({ 
+    startOnLoad: true, 
+    theme: 'default',
+    flowchart: { useMaxWidth: true }
+  });
+</script>
+
+</li>
+</ol>
+
+        
+        ]]>
+      </description>
+    </item>
+    
+  </channel>
+</rss>

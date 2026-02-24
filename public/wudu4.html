@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>五度圈 T(7,12) 交互增强版</title>
+    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+    <style>
+        body { margin: 0; padding: 0; background-color: #050505; color: #eee; font-family: sans-serif; overflow: hidden; }
+        #plot { width: 100vw; height: 100vh; }
+        .ui-panel {
+            position: absolute; top: 20px; left: 20px;
+            background: rgba(15, 15, 15, 0.95); padding: 20px;
+            border-radius: 12px; border: 1px solid #444;
+            pointer-events: auto; backdrop-filter: blur(15px); z-index: 1000;
+            width: 240px; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+        h2 { margin: 0 0 10px 0; font-size: 1.1em; color: #00d4ff; text-align: center; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .status-box { background: #000; padding: 10px; border-radius: 6px; margin: 10px 0; min-height: 40px; display: flex; align-items: center; justify-content: center; }
+        #msg { color: #00ff88; font-weight: bold; font-family: monospace; font-size: 0.9em; text-align: center; }
+        button {
+            width: 100%; padding: 10px; background: #333; color: white; border: 1px solid #555;
+            border-radius: 6px; cursor: pointer; transition: all 0.2s; font-weight: bold;
+        }
+        button:hover { background: #444; border-color: #00d4ff; color: #00d4ff; }
+        button:active { transform: scale(0.98); }
+        .hint { font-size: 0.75em; color: #777; margin-top: 10px; line-height: 1.4; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <div class="ui-panel">
+        <h2>CIRCLE OF FIFTHS</h2>
+        <div class="status-box">
+            <div id="msg">READY: SELECT START</div>
+        </div>
+        <button onclick="resetPlot()">RELOAD / RESET</button>
+        <div class="hint">点击两个音符球连接五度线<br>拖动空白处旋转视角</div>
+    </div>
+
+    <div id="plot"></div>
+
+    <script>
+        const R = 2.5, r = 0.8, p = 7, q = 12;
+        const noteNames = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#', 'G#', 'D#', 'A#', 'F'];
+        const colors = ['#FF0000', '#FF6600', '#FFCC00', '#99FF00', '#00FF66', '#00FFFF', '#0066FF', '#6600FF', '#CC00FF', '#FF0099', '#FF0066', '#FF3333'];
+
+        let selectedPoints = [];
+        const traces = [];
+
+        // 1. 环面背景网格 (0-31)
+        for(let i=0; i<24; i++) {
+            let u = 2 * Math.PI * i / 24;
+            let tv = Array.from({length: 40}, (_, j) => 2 * Math.PI * j / 39);
+            traces.push({
+                x: tv.map(v => (R + r * Math.cos(v)) * Math.cos(u)),
+                y: tv.map(v => (R + r * Math.cos(v)) * Math.sin(u)),
+                z: tv.map(v => r * Math.sin(v)),
+                type: 'scatter3d', mode: 'lines', line: { color: '#111', width: 1 }, hoverinfo: 'skip'
+            });
+        }
+        for(let i=0; i<8; i++) {
+            let v = 2 * Math.PI * i / 8;
+            let tu = Array.from({length: 80}, (_, j) => 2 * Math.PI * j / 79);
+            traces.push({
+                x: tu.map(u => (R + r * Math.cos(v)) * Math.cos(u)),
+                y: tu.map(u => (R + r * Math.cos(v)) * Math.sin(u)),
+                z: tu.map(u => r * Math.sin(v)),
+                type: 'scatter3d', mode: 'lines', line: { color: '#111', width: 1 }, hoverinfo: 'skip'
+            });
+        }
+        const torusLineCount = traces.length;
+
+        // 2. 纽结线段 (32-43)
+        for (let i = 0; i < 12; i++) {
+            let t_s = (2 * Math.PI * i) / 12, t_e = (2 * Math.PI * (i + 1)) / 12;
+            let t_samples = Array.from({length: 40}, (_, j) => t_s + (t_e - t_s) * j / 39);
+            traces.push({
+                x: t_samples.map(t => (R + r * Math.cos(p * t)) * Math.cos(q * t)),
+                y: t_samples.map(t => (R + r * Math.cos(p * t)) * Math.sin(q * t)),
+                z: t_samples.map(t => r * Math.sin(p * t)),
+                type: 'scatter3d', mode: 'lines',
+                line: { color: 'rgba(100, 150, 255, 0.2)', width: 3 },
+                hoverinfo: 'none'
+            });
+        }
+
+        // 3. 音符点 (44)
+        let px=[], py=[], pz=[];
+        noteNames.forEach((_, i) => {
+            let t = (2 * Math.PI * i) / 12;
+            px.push((R + r * Math.cos(p * t)) * Math.cos(q * t));
+            py.push((R + r * Math.cos(p * t)) * Math.sin(q * t));
+            pz.push(r * Math.sin(p * t));
+        });
+        traces.push({
+            x: px, y: py, z: pz,
+            type: 'scatter3d', mode: 'markers+text',
+            marker: { color: colors, size: 10, opacity: 0.9, line: { color: '#fff', width: 1 } },
+            text: noteNames, textposition: 'top center',
+            textfont: { size: 14, color: '#fff' },
+            hoverinfo: 'text'
+        });
+
+        const plotDiv = document.getElementById('plot');
+        Plotly.newPlot(plotDiv, traces, {
+            paper_bgcolor: '#050505', margin: {l:0,r:0,b:0,t:0},
+            scene: {
+                xaxis: {visible:false}, yaxis: {visible:false}, zaxis: {visible:false},
+                aspectmode: 'data',
+                camera: { eye: {x: 2.2, y: 2.2, z: 1.5}, projection: {type:'perspective'} }
+            },
+            showlegend: false
+        }, {displayModeBar: false});
+
+        // 交互逻辑
+        plotDiv.on('plotly_click', function(data) {
+            const curveIdx = data.points[0].curveNumber;
+            const ptIdx = data.points[0].pointNumber;
+
+            if (curveIdx === traces.length - 1) {
+                selectedPoints.push(ptIdx);
+                
+                if (selectedPoints.length === 1) {
+                    document.getElementById('msg').style.color = "#ffcc00";
+                    document.getElementById('msg').innerText = `FROM: ${noteNames[ptIdx]}...`;
+                }
+
+                if (selectedPoints.length === 2) {
+                    const [p1, p2] = selectedPoints;
+                    const diff = Math.abs(p1 - p2);
+                    let lineIdx = -1;
+
+                    // 判定逻辑修复：明确 C(0) 和 F(11) 的闭环
+                    if (diff === 1) {
+                        lineIdx = torusLineCount + Math.min(p1, p2);
+                    } else if (diff === 11) {
+                        lineIdx = torusLineCount + 11; // 专门处理 F-C 连线
+                    }
+
+                    if (lineIdx !== -1) {
+                        applyHighlight(lineIdx, p1, p2);
+                    } else {
+                        document.getElementById('msg').style.color = "#ff4444";
+                        document.getElementById('msg').innerText = "NOT A FIFTH!";
+                        setTimeout(resetPlot, 800);
+                    }
+                    selectedPoints = [];
+                }
+            }
+        });
+
+        function applyHighlight(lineIdx, p1, p2) {
+            // 线条高亮处理
+            const lineIndices = Array.from({length: 12}, (_, i) => torusLineCount + i);
+            const lColors = lineIndices.map(idx => idx === lineIdx ? '#00d4ff' : 'rgba(255,255,255,0.02)');
+            const lWidths = lineIndices.map(idx => idx === lineIdx ? 12 : 1);
+            Plotly.restyle(plotDiv, { 'line.color': lColors, 'line.width': lWidths }, lineIndices);
+
+            // 节点高亮处理：通过数组索引精确匹配，不使用弱类型判断
+            const nodeIndices = [0,1,2,3,4,5,6,7,8,9,10,11];
+            const mSizes = nodeIndices.map(i => (i === p1 || i === p2) ? 25 : 6);
+            const mOpacs = nodeIndices.map(i => (i === p1 || i === p2) ? 1.0 : 0.15);
+            const tColors = nodeIndices.map(i => (i === p1 || i === p2) ? 'white' : 'rgba(255,255,255,0.1)');
+
+            Plotly.restyle(plotDiv, { 
+                'marker.size': [mSizes], 
+                'marker.opacity': [mOpacs],
+                'textfont.color': [tColors]
+            }, [traces.length - 1]);
+
+            document.getElementById('msg').style.color = "#00d4ff";
+            document.getElementById('msg').innerText = `${noteNames[p1]} ➔ ${noteNames[p2]}`;
+        }
+
+        function resetPlot() {
+            const lineIndices = Array.from({length: 12}, (_, i) => torusLineCount + i);
+            Plotly.restyle(plotDiv, { 'line.color': 'rgba(100, 150, 255, 0.25)', 'line.width': 3 }, lineIndices);
+            Plotly.restyle(plotDiv, { 'marker.size': 10, 'marker.opacity': 0.9, 'textfont.color': 'white' }, [traces.length - 1]);
+            selectedPoints = [];
+            document.getElementById('msg').style.color = "#00ff88";
+            document.getElementById('msg').innerText = "READY: SELECT START";
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="google-adsense-account" content="ca-pub-1217183586241699">
+  <meta name="baidu-site-verification" content="codeva-009XlqHtWl" />
+
+    
+
+  
+
+  <title> - 李崎滨 | Arua Van</title>
+
+  <meta name="referrer" content="no-referrer">
+
+  <meta property="og:title" content=" - 李崎滨 | Arua Van">
+  <meta name="description" property="og:description" content="满意度回归分析：有效样本与原数据、变量公式说明
+一、有效样本原数据
+
+文件：回归有效样本_原数据.xlsx
+内容：参与回归的 315 条 有效样本的完整原数据。
+
+包含问卷中全部原始列（如序号、人口学、各题原始作答等）。
+另增加以下回归用变量（由原始题项计算得到）：
+
+满意度_回归用：因变量的数值（用于回归的满意度）
+情感价值EV_回归用、社会价值SV_回归用、名誉价值RV_回归用、功能价值FV_回归用、服务价值PSQ_回归用：五个自变量的数值（用于回归的维度得分）。
+
+
+
+
+有效样本定义：同时满足
+（1）满意度有效（SAT1、SAT2、SAT3 三道题均能提取出 1–5 分）；
+（2）五个价值维度（EV、SV、RV、FV、PSQ）各自题项均能提取出 1–5 分，且维度均值无缺失。
+
+运行 regression_satisfaction.py 后会自动生成该 Excel 文件。">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="李崎滨的个人网站 | Build with Hugo">
+  <meta property="og:url" content="http://localhost:1313/test/">
+
+  
+  
+
+  
+  <meta name="author" property="article:author" content="李崎滨">
+  
+
+  
+  
+
+  
+
+  <meta name="theme-color" content="#0d0d0d">
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/web/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/web/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="/images/web/favicon-48x48.png">
+  <link rel="icon" type="image/png" sizes="62x62" href="/images/web/favicon-62x62.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/images/web/favicon-192x192.png">
+  
+  <link rel="manifest" href="/manifest.json">
+    
+  
+
+  
+
+  <script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "BlogPosting",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "http://localhost:1313/"
+    },
+    "name": "",
+    "headline": "",
+    "description" : "\u003ch1 id=\"满意度回归分析-有效样本与原数据-变量公式说明\"\u003e满意度回归分析：有效样本与原数据、变量公式说明\u003c/h1\u003e\n\u003ch2 id=\"一-有效样本原数据\"\u003e一、有效样本原数据\u003c/h2\u003e\n\u003cul\u003e\n\u003cli\u003e\u003cstrong\u003e文件\u003c/strong\u003e：\u003ccode\u003e回归有效样本_原数据.xlsx\u003c/code\u003e\u003c/li\u003e\n\u003cli\u003e\u003cstrong\u003e内容\u003c/strong\u003e：参与回归的 \u003cstrong\u003e315 条\u003c/strong\u003e 有效样本的完整原数据。\n\u003cul\u003e\n\u003cli\u003e包含问卷中\u003cstrong\u003e全部原始列\u003c/strong\u003e（如序号、人口学、各题原始作答等）。\u003c/li\u003e\n\u003cli\u003e另增加以下\u003cstrong\u003e回归用变量\u003c/strong\u003e（由原始题项计算得到）：\n\u003cul\u003e\n\u003cli\u003e\u003ccode\u003e满意度_回归用\u003c/code\u003e：因变量的数值（用于回归的满意度）\u003c/li\u003e\n\u003cli\u003e\u003ccode\u003e情感价值EV_回归用\u003c/code\u003e、\u003ccode\u003e社会价值SV_回归用\u003c/code\u003e、\u003ccode\u003e名誉价值RV_回归用\u003c/code\u003e、\u003ccode\u003e功能价值FV_回归用\u003c/code\u003e、\u003ccode\u003e服务价值PSQ_回归用\u003c/code\u003e：五个自变量的数值（用于回归的维度得分）。\u003c/li\u003e\n\u003c/ul\u003e\n\u003c/li\u003e\n\u003c/ul\u003e\n\u003c/li\u003e\n\u003cli\u003e\u003cstrong\u003e有效样本定义\u003c/strong\u003e：同时满足\u003cbr\u003e\n（1）满意度有效（SAT1、SAT2、SAT3 三道题均能提取出 1–5 分）；\u003cbr\u003e\n（2）五个价值维度（EV、SV、RV、FV、PSQ）各自题项均能提取出 1–5 分，且维度均值无缺失。\u003c/li\u003e\n\u003c/ul\u003e\n\u003cp\u003e运行 \u003ccode\u003eregression_satisfaction.py\u003c/code\u003e 后会自动生成该 Excel 文件。\u003c/p\u003e",
+    "genre": [
+      
+    ],
+    "datePublished": "0001-01-01",
+    "dateModified": "0001-01-01",
+    "wordCount": "1964",
+    "keywords": [
+      
+    ],
+    "image": [
+      
+    ],
+    "author": {
+      "@type": "Person",
+      "name": "李崎滨"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "李崎滨",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "http://localhost:1313/images/web/publisher-logo.png"
+      }
+    },
+    "url": "http://localhost:1313/test/"
+  }
+  </script>
+  
+
+  
+
+  
+
+
+
+<script>
+window.MathJax = {
+  loader: {
+    load: ['[tex]/boldsymbol']
+  },
+  tex: {
+    tags: "all",
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$']],
+    processEscapes: true,
+    processEnvironments: true,
+    packages: {
+      '[+]': ['boldsymbol']
+    }
+  },
+  options: {
+     
+    skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+  },
+  startup: {
+    ready: () => {
+      
+      MathJax.startup.defaultReady();
+      MathJax.startup.promise.then(() => {
+        console.log('MathJax initial typesetting complete');
+      });
+      
+      
+      const triggerRender = () => {
+        if (typeof MathJax.typesetPromise === 'function') {
+          MathJax.typesetPromise();
+        }
+      };
+
+      if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        triggerRender();
+      } else {
+        document.addEventListener('DOMContentLoaded', triggerRender);
+      }
+    }
+  }
+};
+</script>
+
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3.2/es5/tex-mml-chtml.js" crossorigin="anonymous"></script>
+
+
+<style>
+  mjx-container {
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    max-width: 100% !important;
+    padding: 0.5em 0;
+  }
+</style>
+
+
+
+
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1217183586241699" crossorigin="anonymous"></script>
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/fonts.css">
+<link rel="stylesheet" type="text/css" href="/css/style.css">
+<link rel="stylesheet" type="text/css" href="/css/icons.css">
+<link rel="stylesheet" type="text/css" href="/css/print.css">
+
+
+<link rel="stylesheet" type="text/css" href="/css/donate.css">
+
+
+
+
+
+
+
+
+  </head>
+
+  
+  <body class="test">
+  <header class="masthead">
+    
+
+<div class="logo"><img src="/images/web/icon-512x512.png" alt="logo"></div>
+<p class="slogan">己所不欲，勿施于人</p>
+    <nav class="menu">
+  <ul>
+  
+  
+  
+    
+  
+  
+    <li><a href="/">首页</a></li>
+  
+    <li><a href="/cn_aura/">博客</a></li>
+  
+    <li><a href="/categories/">分类</a></li>
+  
+    <li class="menu-separator"><span>&nbsp;</span></li>
+  
+    <li><a href="/painting/">绘画</a></li>
+  
+    <li><a href="/cn/about/">关于</a></li>
+  
+    <li><a href="/cn/resume/">简历</a></li>
+  
+  
+  
+  
+    
+  
+  <li class="theme-toggle no-border-bottom"><span id="theme-toggle-icon" class="material-symbols"></span></li>
+  </ul>
+</nav>
+
+  </header>
+
+  <article class="main">
+    <header class="content-title">
+    
+<h1 class="title">
+  
+  
+  
+</h1>
+
+
+
+
+
+
+
+<h2 class="author-date">李崎滨 / 
+</h2>
+
+
+
+
+
+<hr>
+
+
+
+    
+    
+    <ins
+    class="adsbygoogle"
+    style="display:block; text-align:center;"
+    data-ad-layout="in-article"
+    data-ad-format="fluid"
+    data-ad-client="ca-pub-1217183586241699"
+    data-ad-slot="1261604535"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+    
+    </header>
+
+
+
+
+<h1 id="满意度回归分析-有效样本与原数据-变量公式说明">满意度回归分析：有效样本与原数据、变量公式说明</h1>
+<h2 id="一-有效样本原数据">一、有效样本原数据</h2>
+<ul>
+<li><strong>文件</strong>：<code>回归有效样本_原数据.xlsx</code></li>
+<li><strong>内容</strong>：参与回归的 <strong>315 条</strong> 有效样本的完整原数据。
+<ul>
+<li>包含问卷中<strong>全部原始列</strong>（如序号、人口学、各题原始作答等）。</li>
+<li>另增加以下<strong>回归用变量</strong>（由原始题项计算得到）：
+<ul>
+<li><code>满意度_回归用</code>：因变量的数值（用于回归的满意度）</li>
+<li><code>情感价值EV_回归用</code>、<code>社会价值SV_回归用</code>、<code>名誉价值RV_回归用</code>、<code>功能价值FV_回归用</code>、<code>服务价值PSQ_回归用</code>：五个自变量的数值（用于回归的维度得分）。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>有效样本定义</strong>：同时满足<br>
+（1）满意度有效（SAT1、SAT2、SAT3 三道题均能提取出 1–5 分）；<br>
+（2）五个价值维度（EV、SV、RV、FV、PSQ）各自题项均能提取出 1–5 分，且维度均值无缺失。</li>
+</ul>
+<p>运行 <code>regression_satisfaction.py</code> 后会自动生成该 Excel 文件。</p>
+<hr>
+<h2 id="二-原始题项与数值提取规则">二、原始题项与数值提取规则</h2>
+<p>问卷中题项为<strong>文本选项</strong>（如「1非常不同意」「4同意」）。回归前统一按下列规则转为 <strong>1–5 数值</strong>：</p>
+<ul>
+<li><strong>提取规则</strong>：取该题<strong>第一个字符</strong>；若为数字 1–5，则记为该题的数值，否则记为缺失。</li>
+<li><strong>缺失</strong>：若该题为空、<code>(跳过)</code> 或无法解析出 1–5，则该题数值为缺失，不参与该题所在维度均值的计算；若某样本在因变量或任一二阶维度上存在缺失，则<strong>不进入有效样本</strong>（即不参与回归）。</li>
+</ul>
+<hr>
+<h2 id="三-回归时变量的计算公式">三、回归时变量的计算公式</h2>
+<h3 id="1-因变量-满意度">1. 因变量：满意度</h3>
+<ul>
+<li><strong>含义</strong>：游客满意度，由问卷中 23 题下三道满意度题项构成。</li>
+<li><strong>对应题项（列名）</strong>：
+<ul>
+<li>SAT1：<code>23、满意度—SAT1. 总体而言，我对豫章书院的参观体验感到满意</code></li>
+<li>SAT2：<code>23、SAT2. 豫章书院的实际体验符合甚至超出了我的预期</code></li>
+<li>SAT3：<code>23、SAT3.我认为到豫章书院游玩是个合适的选择</code></li>
+</ul>
+</li>
+<li><strong>公式</strong>：
+<ul>
+<li>对每题按「二、原始题项与数值提取规则」得到数值 ( \text{SAT1}, \text{SAT2}, \text{SAT3} \in [1,5] )（缺失则不参与）。</li>
+<li>因变量为三道题数值的<strong>算术平均值</strong>：
+[
+\text{满意度} = \frac{\text{SAT1} + \text{SAT2} + \text{SAT3}}{3}.
+]</li>
+<li>仅当 SAT1、SAT2、SAT3 <strong>均有有效数值</strong>时，该样本才有「满意度」，并可能进入有效样本。</li>
+</ul>
+</li>
+</ul>
+<h3 id="2-自变量-情感价值-ev">2. 自变量：情感价值（EV）</h3>
+<ul>
+<li><strong>对应题项</strong>：
+<ul>
+<li>EV1：<code>18、情感价值—EV1. 豫章书院的氛围让我感到愉悦</code></li>
+<li>EV2：<code>18、EV2. 在豫章书院参观或体验让我感到身心放松</code></li>
+<li>EV3：<code>18、EV3. 我感觉到豫章书院游玩心情愉悦</code></li>
+</ul>
+</li>
+<li><strong>公式</strong>：每题按上述规则得到 1–5 数值后，
+[
+\text{情感价值EV} = \frac{\text{EV1} + \text{EV2} + \text{EV3}}{3}.
+]</li>
+</ul>
+<h3 id="3-自变量-社会价值-sv">3. 自变量：社会价值（SV）</h3>
+<ul>
+<li><strong>对应题项</strong>：
+<ul>
+<li>SV1：<code>19、社会价值—SV1. 参观豫章书院是一种有文化品位的体现</code></li>
+<li>SV2：<code>19、SV2. 我会因为推荐豫章书院而获得他人的好感</code></li>
+<li>SV3：<code>19、SV3. 豫章书院的重新发展将得到社会的支持</code></li>
+</ul>
+</li>
+<li><strong>公式</strong>：
+[
+\text{社会价值SV} = \frac{\text{SV1} + \text{SV2} + \text{SV3}}{3}.
+]</li>
+</ul>
+<h3 id="4-自变量-名誉价值-rv">4. 自变量：名誉价值（RV）</h3>
+<ul>
+<li><strong>对应题项</strong>：
+<ul>
+<li>RV1：<code>20、名誉价值—RV1. 豫章书院在本地有良好的声誉</code></li>
+<li>RV2：<code>20、RV2. 豫章书院经常被他人高度评价</code></li>
+<li>RV3：<code>20、RV3. 豫章书院被他人尊重</code></li>
+</ul>
+</li>
+<li><strong>公式</strong>：
+[
+\text{名誉价值RV} = \frac{\text{RV1} + \text{RV2} + \text{RV3}}{3}.
+]</li>
+</ul>
+<h3 id="5-自变量-功能价值-fv">5. 自变量：功能价值（FV）</h3>
+<ul>
+<li><strong>对应题项</strong>：
+<ul>
+<li>FV1：<code>21、功能价值—FV1.我感觉到豫章书院游玩受益匪浅</code></li>
+<li>FV2：<code>21、FV2. 我感觉书院项目的安排符合实际需求</code></li>
+<li>FV3：<code>21、FV3. 参观书院增强了我的文化认同感</code></li>
+<li>FV4：<code>21、FV4. 书院提供了独特的社交体验</code></li>
+</ul>
+</li>
+<li><strong>公式</strong>：
+[
+\text{功能价值FV} = \frac{\text{FV1} + \text{FV2} + \text{FV3} + \text{FV4}}{4}.
+]</li>
+</ul>
+<h3 id="6-自变量-服务价值-psq">6. 自变量：服务价值（PSQ）</h3>
+<ul>
+<li><strong>对应题项</strong>：
+<ul>
+<li>PSQ1：<code>22、服务价值—PSQ1. 书院环境卫生整洁</code></li>
+<li>PSQ2：<code>22、PSQ2. 服务人员态度友好</code></li>
+<li>PSQ3：<code>22、PSQ3. 导览标识清晰易懂</code></li>
+<li>PSQ4：<code>22、PSQ4. 书院设施便利（休息区、洗手间等）</code></li>
+</ul>
+</li>
+<li><strong>公式</strong>：
+[
+\text{服务价值PSQ} = \frac{\text{PSQ1} + \text{PSQ2} + \text{PSQ3} + \text{PSQ4}}{4}.
+]</li>
+</ul>
+<hr>
+<h2 id="四-实际回归时的模型公式">四、实际回归时的模型公式</h2>
+<p>回归采用<strong>多元线性回归（OLS）</strong>，模型为：</p>
+<p>[
+\text{满意度} = \beta_0 + \beta_1 \cdot \text{情感价值EV} + \beta_2 \cdot \text{社会价值SV} + \beta_3 \cdot \text{名誉价值RV} + \beta_4 \cdot \text{功能价值FV} + \beta_5 \cdot \text{服务价值PSQ} + \varepsilon,
+]</p>
+<p>其中 ( \varepsilon ) 为误差项。<strong>本次估计结果</strong>（未标准化）为：</p>
+<table>
+  <thead>
+      <tr>
+          <th>参数</th>
+          <th>估计值</th>
+          <th>含义</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>( \beta_0 ) (const)</td>
+          <td>1.6179</td>
+          <td>截距</td>
+      </tr>
+      <tr>
+          <td>( \beta_1 )</td>
+          <td>0.1239</td>
+          <td>情感价值EV 每增加 1 分，满意度平均增加约 0.124 分</td>
+      </tr>
+      <tr>
+          <td>( \beta_2 )</td>
+          <td>0.2105</td>
+          <td>社会价值SV 每增加 1 分，满意度平均增加约 0.211 分</td>
+      </tr>
+      <tr>
+          <td>( \beta_3 )</td>
+          <td>0.0471</td>
+          <td>名誉价值RV 每增加 1 分，满意度平均增加约 0.047 分</td>
+      </tr>
+      <tr>
+          <td>( \beta_4 )</td>
+          <td>0.0234</td>
+          <td>功能价值FV 每增加 1 分，满意度平均增加约 0.023 分</td>
+      </tr>
+      <tr>
+          <td>( \beta_5 )</td>
+          <td>0.1579</td>
+          <td>服务价值PSQ 每增加 1 分，满意度平均增加约 0.158 分</td>
+      </tr>
+  </tbody>
+</table>
+<p>即<strong>实际回归时使用的公式</strong>为：</p>
+<p>[
+\boxed{
+\text{满意度} = 1.618 + 0.124 \cdot \text{情感价值EV} + 0.211 \cdot \text{社会价值SV} + 0.047 \cdot \text{名誉价值RV} + 0.023 \cdot \text{功能价值FV} + 0.158 \cdot \text{服务价值PSQ}.
+}
+]</p>
+<p>上述公式中，<strong>满意度</strong>、<strong>情感价值EV</strong>、<strong>社会价值SV</strong>、<strong>名誉价值RV</strong>、<strong>功能价值FV</strong>、<strong>服务价值PSQ</strong> 均由第三部分给出的题项与计算公式得到；回归使用的样本即「有效样本原数据」中的 315 条。</p>
+
+
+
+
+
+<div class="donate">
+  <div class="donate-header"></div>
+  <div class="donate-slug" id="donate-slug"></div>
+  <button class="donate-button">赞 赏</button>
+  <div class="donate-footer">「往来无百丁，请君备注留姓名（wx)」</div>
+</div>
+<div class="donate-modal-wrapper">
+  <div class="donate-modal">
+    <div class="donate-box">
+      <div class="donate-box-content">
+        <div class="donate-box-content-inner">
+          <div class="donate-box-header">「往来无百丁，请君备注留姓名（wx)」</div>
+          <div class="donate-box-body">
+            <div class="donate-box-money">
+              
+              
+            </div>
+            <div class="donate-box-pay">
+              <img class="donate-box-pay-qrcode" id="donate-box-pay-qrcode" src=""/>
+            </div>
+          </div>
+          <div class="donate-box-footer">
+            <div class="donate-box-pay-method donate-box-pay-method-checked" data-v="wechat-pay">
+              <img class="donate-box-pay-method-image" id="donate-box-pay-method-image-wechat-pay" src=""/>
+            </div>
+            <div class="donate-box-pay-method" data-v="alipay">
+              <img class="donate-box-pay-method-image"  id="donate-box-pay-method-image-alipay" src=""/>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button type="button" class="donate-box-close-button">
+      <svg class="donate-box-close-button-icon" fill="#fff" viewBox="0 0 24 24" width="24" height="24"><path d="M13.486 12l5.208-5.207a1.048 1.048 0 0 0-.006-1.483 1.046 1.046 0 0 0-1.482-.005L12 10.514 6.793 5.305a1.048 1.048 0 0 0-1.483.005 1.046 1.046 0 0 0-.005 1.483L10.514 12l-5.208 5.207a1.048 1.048 0 0 0 .006 1.483 1.046 1.046 0 0 0 1.482.005L12 13.486l5.207 5.208a1.048 1.048 0 0 0 1.483-.006 1.046 1.046 0 0 0 .005-1.482L13.486 12z" fill-rule="evenodd"></path></svg>
+    </button>
+  </div>
+</div>
+
+<script type="text/javascript" src="/js/donate.js"></script>
+
+
+  <footer>
+  
+
+
+
+<ins
+  class="adsbygoogle"
+  style="display:block; text-align:center;"
+  data-ad-layout="in-article"
+  data-ad-format="fluid"
+  data-ad-client="ca-pub-1217183586241699"
+  data-ad-slot="8302038603"></ins>
+<script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+
+
+<script src='//cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js'></script>
+<script src="/js/toggle-theme.js"></script>
+
+
+<script src="/js/no-highlight.js"></script>
+<script src="/js/math-code.js"></script>
+<script src="/js/heading-anchor.js"></script>
+
+
+
+<section class="comments">
+<script 
+src="https://giscus.app/client.js"
+data-repo="auravan/auravan.github.io"
+data-repo-id="R_kgDOJ2p3cw"
+data-category="Announcements"
+data-category-id="DIC_kwDOJ2p3c84C0Vvz"
+data-mapping="url"
+data-strict="0"
+data-reactions-enabled="1"
+data-emit-metadata="0"
+data-input-position="bottom"
+data-theme="preferred_color_scheme"
+data-lang="zh-CN"
+crossorigin="anonymous"
+async>
+</script>
+</section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script async src="/js/center-img.js"></script>
+<script async src="/js/right-quote.js"></script>
+<script async src="/js/external-link.js"></script>
+<script async src="/js/alt-title.js"></script>
+<script async src="/js/figure.js"></script>
+
+
+
+<script src="//cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script>
+
+
+<script src="//cdn.jsdelivr.net/npm/vanilla-back-to-top@latest/dist/vanilla-back-to-top.min.js"></script>
+<script>
+addBackToTop({
+  diameter: 48
+});
+</script>
+
+  <hr>
+  <div class="copyright no-border-bottom">
+    <div class="copyright-author-year">
+      <span>Copyright &copy; 2024-2026 [李崎滨 | Aura Van]|您是第<span id='visit_count'>--</span>位访问者</span>
+    </div>
+  </div>
+  </footer>
+  </article>
+  </body>
+</html>
+<script>
+  
+  fetch('https://counter.auravan.top')
+    .then(response => response.text())
+    .then(count => {
+      document.getElementById('visit_count').innerText = count;
+    });
+</script>
+

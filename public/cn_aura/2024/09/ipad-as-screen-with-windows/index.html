@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="google-adsense-account" content="ca-pub-1217183586241699">
+  <meta name="baidu-site-verification" content="codeva-009XlqHtWl" />
+
+    
+
+  
+
+  <title>软件实现HDMI阻塞的iPad/Windows无线副屏方案 - 李崎滨 | Arua Van</title>
+
+  <meta name="referrer" content="no-referrer">
+
+  <meta property="og:title" content="软件实现HDMI阻塞的iPad/Windows无线副屏方案 - 李崎滨 | Arua Van">
+  <meta name="description" property="og:description" content="使用场景
+如果办公需要屏幕拓展，苹果电脑用户常用Airplay（随航）将iPad作为一个副屏使用。有无线屏幕拓展需求的pc用户如今也可以使用iPad实现同样的功能，更加丝滑，可配置。">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="李崎滨的个人网站 | Build with Hugo">
+  <meta property="og:url" content="https://auravan.top/cn_aura/2024/09/ipad-as-screen-with-windows/">
+
+  
+  
+
+  
+  <meta name="author" property="article:author" content="李崎滨">
+  
+
+  
+  <meta name="date" property="article:published_time" content="2024-09-09" scheme="YYYY-MM-DD">
+  
+  
+  <meta name="date" property="article:modified_time" content="2024-09-09" scheme="YYYY-MM-DD">
+  
+
+  
+  <meta name="keywords" property="article:tag" content ="ipad,无线串流,moonlight,sunshine,vitrual display driver">
+  
+
+  <meta name="theme-color" content="#0d0d0d">
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/web/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/web/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="/images/web/favicon-48x48.png">
+  <link rel="icon" type="image/png" sizes="62x62" href="/images/web/favicon-62x62.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/images/web/favicon-192x192.png">
+  
+  <link rel="manifest" href="/manifest.json">
+    
+  
+
+  
+
+  <script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "BlogPosting",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://auravan.top/cn_aura"
+    },
+    "name": "软件实现HDMI阻塞的iPad/Windows无线副屏方案",
+    "headline": "软件实现HDMI阻塞的iPad/Windows无线副屏方案",
+    "description" : "\u003ch1 id=\"使用场景\"\u003e使用场景\u003c/h1\u003e\n\u003cp\u003e如果办公需要屏幕拓展，苹果电脑用户常用Airplay（随航）将iPad作为一个副屏使用。有无线屏幕拓展需求的pc用户如今也可以使用iPad实现同样的功能，更加丝滑，可配置。\u003c/p\u003e",
+    "genre": [
+      "生活小技巧"
+    ],
+    "datePublished": "2024-09-09",
+    "dateModified": "2024-09-09",
+    "wordCount": "1153",
+    "keywords": [
+      "ipad", "无线串流", "moonlight", "sunshine", "vitrual display driver"
+    ],
+    "image": [
+      
+    ],
+    "author": {
+      "@type": "Person",
+      "name": "李崎滨"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "李崎滨",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://auravan.top/images/web/publisher-logo.png"
+      }
+    },
+    "url": "https://auravan.top/cn_aura/2024/09/ipad-as-screen-with-windows/"
+  }
+  </script>
+  
+
+  
+
+  
+
+
+
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/fonts.css">
+<link rel="stylesheet" type="text/css" href="/css/style.css">
+<link rel="stylesheet" type="text/css" href="/css/icons.css">
+<link rel="stylesheet" type="text/css" href="/css/print.css">
+
+
+<link rel="stylesheet" type="text/css" href="/css/donate.css">
+
+
+
+
+
+
+
+
+  </head>
+
+  
+  <body class="cn_aura">
+  <header class="masthead">
+    
+
+<div class="logo"><img src="/images/web/icon-512x512.png" alt="logo"></div>
+<p class="slogan">己所不欲，勿施于人</p>
+    <nav class="menu">
+  <ul>
+  
+  
+  
+    
+  
+  
+    <li><a href="/">首页</a></li>
+  
+    <li><a href="/cn_aura/">博客</a></li>
+  
+    <li><a href="/categories/">分类</a></li>
+  
+    <li class="menu-separator"><span>&nbsp;</span></li>
+  
+    <li><a href="/painting/">绘画</a></li>
+  
+    <li><a href="/cn/about/">关于</a></li>
+  
+    <li><a href="/cn/resume/">简历</a></li>
+  
+  
+  
+  
+    
+    <li class="menu-separator"><span>&nbsp;</span></li>
+    <li><a href="/cn_aura/index.xml" target="_blank" type="application/rss+xml">订阅</a></li>
+    
+  
+  <li class="theme-toggle no-border-bottom"><span id="theme-toggle-icon" class="material-symbols"></span></li>
+  </ul>
+</nav>
+
+  </header>
+
+  <article class="main">
+    <header class="content-title">
+    
+<h1 class="title">
+  
+  软件实现HDMI阻塞的iPad/Windows无线副屏方案
+  
+</h1>
+
+
+
+
+
+
+
+
+
+<h3 class="post-meta">
+
+
+<strong>分类: </strong>
+<a href="/categories/%E7%94%9F%E6%B4%BB%E5%B0%8F%E6%8A%80%E5%B7%A7">生活小技巧</a>
+
+
+
+
+/
+
+
+
+
+<strong>标签: </strong>
+<span>ipad</span>, <span>无线串流</span>, <span>moonlight</span>, <span>sunshine</span>, <span>vitrual display driver</span>
+
+
+
+
+/
+
+
+<strong>字数: </strong>
+1153
+</h3>
+
+
+
+<hr>
+
+
+
+    
+    </header>
+
+
+
+
+<h1 id="使用场景">使用场景</h1>
+<p>如果办公需要屏幕拓展，苹果电脑用户常用Airplay（随航）将iPad作为一个副屏使用。有无线屏幕拓展需求的pc用户如今也可以使用iPad实现同样的功能，更加丝滑，可配置。</p>
+<p>曾经这个实现受限于投屏软件的使用，但<a href="https://moonlight-stream.org/">moonlight</a>的出现和普及使得这个方案变得可行。</p>
+<h1 id="前置任务-完成moonlight串流">前置任务（完成moonlight串流）</h1>
+<p>如果你有有使用moonlight<strong>串流PCVR游戏或者windows桌面</strong>的经验，你将很快实现本文所说的方案。
+如果没有，你应该尝试搜索b站完成moonlight的相关配置。当你成功之后这个方案将唾手可得（划掉）。</p>
+<h1 id="实现虚拟拓展副屏">实现虚拟拓展副屏</h1>
+<p>现在开始，只差临门一脚。我们只需要一个0成本的方案提供一块虚拟副屏，让windows操作系统认为我们接上了实际的屏幕，并使moonlight串流显示额外的屏幕内容，而不是默认的主屏幕。</p>
+<p>Mike Rodriguez开源的<a href="https://github.com/itsmikethetech/Virtual-Display-Driver">Virtual-Display-Driver</a>(简称vdd)项目给出了只需要软件配置就可以实现的虚拟副屏的方案，而非HDMI阻塞的传统方案。
+你需要按照指引解决安装问题，直到windows系统识别到第二块屏幕。这中间可能会踩到一些坑，但是相信我这对于最后的成功来说这是值得的。</p>
+<h1 id="最后的配置">最后的配置</h1>
+<p>注意，由于是虚拟屏幕，所以设备的标识会如同ip地址一样被随机分配，你可能会<strong>经常</strong>使用下面的步骤：
+sunshine在windows的配置中需要指定一块屏幕，sunshine的软件包中给出了好用的工具帮我们识别这些屏幕在系统中的标识。</p>
+<pre><code>#PS C:\Program Files\Sunshine\tools&gt;在Sunshine的安装包内tools文件夹打开terminal
+.\dxgi-info.exe
+</code></pre>
+<p>得到结果如下：</p>
+<pre><code>====== ADAPTER =====
+Device Name      : NVIDIA GeForce RTX 3060 Laptop GPU
+Device Vendor ID : 0x000010DE
+Device Device ID : 0x00002560
+Device Video Mem : 6010 MiB
+Device Sys Mem   : 0 MiB
+Share Sys Mem    : 8096 MiB
+
+    ====== OUTPUT ======
+    Output Name       : \\.\DISPLAY1     //这是电脑自带的主屏幕
+    AttachedToDesktop : yes
+    Resolution        : 2560x1600
+
+    Output Name       : \\.\DISPLAY23
+    AttachedToDesktop : yes
+    Resolution        : 2560x1600
+
+</code></pre>
+<p>找到对应新建的虚拟副屏,找到这个副屏对应的标识\<strong>\.\DISPLAY23</strong>(不同机器标识不同)。
+运行sunshine后，打开浏览器进入//localhost:47990/config#界面。</p>
+<p>将此标识写入Audio/vedio选项卡的<strong>输出名称</strong>下，即可实现丝滑串流。（配置建议moonlight打开120hz）</p>
+<h1 id="可能的坑">可能的坑</h1>
+<p>由于vdd实现的虚拟屏幕并不支持实时监测屏幕的连接和删除，ipad在关闭串流后，内留在ipad窗口的软件并不会重新显示在pc主屏幕上。</p>
+<p>解决办法：把两个屏幕内容合并。在windows屏幕配置界面做如下位置修改。</p>
+<p><img src="/images/config_screen.png" alt=""></p>
+<h1 id="结语">结语</h1>
+<p>如果你成功实现，那么你收获了一个非常不错的ipad做wireless副屏的解决方案。
+这个过程中你会熟悉命令行，适配器和显示器的知识，串流码率的配置和一些奇怪的知识。</p>
+<h1 id="参考资料">参考资料</h1>
+<p><a href="https://ivonblog.com/posts/moonlight-use-a-tablet-as-a-second-monitor/">这位台湾老哥</a>的资料是一切的开始。</p>
+<p>如果您觉得不错或者有问题需要帮助，请赞赏留言。</p>
+
+
+
+
+
+<div class="donate">
+  <div class="donate-header"></div>
+  <div class="donate-slug" id="donate-slug">ipad-as-screen-with-windows</div>
+  <button class="donate-button">赞 赏</button>
+  <div class="donate-footer">「往来无百丁，请君备注留姓名（wx)」</div>
+</div>
+<div class="donate-modal-wrapper">
+  <div class="donate-modal">
+    <div class="donate-box">
+      <div class="donate-box-content">
+        <div class="donate-box-content-inner">
+          <div class="donate-box-header">「往来无百丁，请君备注留姓名（wx)」</div>
+          <div class="donate-box-body">
+            <div class="donate-box-money">
+              
+              
+            </div>
+            <div class="donate-box-pay">
+              <img class="donate-box-pay-qrcode" id="donate-box-pay-qrcode" src=""/>
+            </div>
+          </div>
+          <div class="donate-box-footer">
+            <div class="donate-box-pay-method donate-box-pay-method-checked" data-v="wechat-pay">
+              <img class="donate-box-pay-method-image" id="donate-box-pay-method-image-wechat-pay" src=""/>
+            </div>
+            <div class="donate-box-pay-method" data-v="alipay">
+              <img class="donate-box-pay-method-image"  id="donate-box-pay-method-image-alipay" src=""/>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button type="button" class="donate-box-close-button">
+      <svg class="donate-box-close-button-icon" fill="#fff" viewBox="0 0 24 24" width="24" height="24"><path d="M13.486 12l5.208-5.207a1.048 1.048 0 0 0-.006-1.483 1.046 1.046 0 0 0-1.482-.005L12 10.514 6.793 5.305a1.048 1.048 0 0 0-1.483.005 1.046 1.046 0 0 0-.005 1.483L10.514 12l-5.208 5.207a1.048 1.048 0 0 0 .006 1.483 1.046 1.046 0 0 0 1.482.005L12 13.486l5.207 5.208a1.048 1.048 0 0 0 1.483-.006 1.046 1.046 0 0 0 .005-1.482L13.486 12z" fill-rule="evenodd"></path></svg>
+    </button>
+  </div>
+</div>
+
+<script type="text/javascript" src="/js/donate.js"></script>
+
+
+  <footer>
+  
+<nav class="post-nav">
+  <span class="nav-prev">&larr; <a href="/cn_aura/2024/09/piano-as-leaf/">钢琴的一种拓扑叶</a></span>
+  <span class="nav-next"><a href="/cn_aura/2024/09/what-is-music/">音乐是生命的哈希</a> &rarr;</span>
+</nav>
+
+
+
+
+<script src='//cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js'></script>
+<script src="/js/toggle-theme.js"></script>
+
+
+<script src="/js/no-highlight.js"></script>
+<script src="/js/math-code.js"></script>
+<script src="/js/heading-anchor.js"></script>
+
+
+
+
+<script src="//cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/toolbar/prism-toolbar.min.js"></script>
+<script>
+  (function() {
+    if (!self.Prism) {
+      return;
+    }
+
+    
+    Prism.languages.dos = Prism.languages.powershell;
+    Prism.languages.gremlin = Prism.languages.groovy;
+
+    let languages = {
+      'apacheconf': 'Apache Configuration', 
+      'bash': 'Bash',
+      'c': 'C',
+      'css': 'CSS',
+      'cypher': 'Cypher',
+      'dos': 'DOS',
+      'gremlin': 'Gremlin',
+      'html': 'HTML',
+      'javascript': 'JavaScript',
+      'json': 'JSON', 
+      'latex': 'LaTeX',
+      'ngql': 'nGQL',
+      'powershell': 'PowerShell',
+      'python': 'Python',
+      'qml': 'QML',
+      'r': 'R',
+      'sh': 'Shell',
+      'shell': 'Shell',
+      'sparql': 'SPARQL',
+      'sql': 'SQL',
+      'tex': 'TeX',
+      'text': 'Text',
+      'txt': 'Text',
+      'xml': 'XML', 
+      'yaml': 'YAML',
+    };
+
+    Prism.hooks.add('before-highlight', function(env) {
+      if (env.language !== 'plain') {
+        let language = languages[env.language] || env.language;
+        env.element.setAttribute('data-language', language);
+      }
+    });
+
+    
+    let ClipboardJS = window.ClipboardJS || undefined;
+
+    Prism.plugins.toolbar.registerButton('copy-to-clipboard', function(env) {
+      let linkCopy = document.createElement('button');
+      linkCopy.classList.add('prism-button-copy');
+
+      registerClipboard();
+
+      return linkCopy;
+
+      function registerClipboard() {
+        let clip = new ClipboardJS(linkCopy, {
+          'text': function () {
+            return env.code;
+          }
+        });
+
+        clip.on('success', function() {
+          linkCopy.classList.add('prism-button-copy-success');
+          resetText();
+        });
+        clip.on('error', function () {
+          linkCopy.classList.add('prism-button-copy-error');
+          resetText();
+        });
+      }
+
+      function resetText() {
+        setTimeout(function () {
+          linkCopy.classList.remove('prism-button-copy-success');
+          linkCopy.classList.remove('prism-button-copy-error');
+        }, 1600);
+      }
+    });
+  })();
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script async src="/js/center-img.js"></script>
+<script async src="/js/right-quote.js"></script>
+<script async src="/js/external-link.js"></script>
+<script async src="/js/alt-title.js"></script>
+<script async src="/js/figure.js"></script>
+
+
+
+<script src="//cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script>
+
+
+<script src="//cdn.jsdelivr.net/npm/vanilla-back-to-top@latest/dist/vanilla-back-to-top.min.js"></script>
+<script>
+addBackToTop({
+  diameter: 48
+});
+</script>
+
+  <hr>
+  <div class="copyright no-border-bottom">
+    <div class="copyright-author-year">
+      <span>Copyright &copy; 2024-2026 [李崎滨 | Aura Van]|您是第<span id='visit_count'>--</span>位访问者</span>
+    </div>
+  </div>
+  </footer>
+  </article>
+  </body>
+</html>
+<script>
+  
+  fetch('https://counter.auravan.top')
+    .then(response => response.text())
+    .then(count => {
+      document.getElementById('visit_count').innerText = count;
+    });
+</script>
+

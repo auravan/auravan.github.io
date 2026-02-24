@@ -1,0 +1,113 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Restful on 李崎滨 | Arua Van</title>
+    <link>https://auravan.top/tags/restful/</link>
+    <description>Recent content in Restful on 李崎滨 | Arua Van</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Fri, 29 Nov 2024 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://auravan.top/tags/restful/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>restfulapi实战避坑指南</title>
+      <link>https://auravan.top/cn_aura/2024/11/restful-demo/</link>
+      <pubDate>Fri, 29 Nov 2024 00:00:00 +0000</pubDate>
+      
+      <guid>https://auravan.top/cn_aura/2024/11/restful-demo/</guid>
+      <description>
+        <![CDATA[
+        <h1 id="restfulapi-实战避坑指南">RESTFULAPI 实战避坑指南</h1>
+<p>文章基于这个<a href="https://docs.google.com/document/d/1v0l4TC2ZyFYyk6Y0ggFw86li2F6cwr5GLuTUyrzSpT4/edit?tab=t.0,%E4%B8%80%E4%B8%AArestfulapi%E7%9A%84%E5%B0%8Fdemo">内容</a>：
+学习过程中遇到如下问题：</p>
+<ul>
+<li>windows下venv环境激活涉及的powershell脚本权限</li>
+<li>flask相关命令行内容和上下文保持</li>
+</ul>
+<p>下面是对应内容的补充展开，方便大家根据上面内容学习：</p>
+<h2 id="winodws虚拟环境激活">winodws虚拟环境激活</h2>
+<p>注意windows环境下启用venv时候需要powershell的执行权限。参考https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-7.4#powershell-execution-policies
+PolicyName选择AllSigned或者其他合适的</p>
+<pre><code>Set-ExecutionPolicy -ExecutionPolicy &lt;PolicyName&gt;
+</code></pre>
+<h2 id="上下文保持细节">上下文保持细节</h2>
+<p>使用python代码调试falsk应用需要使得flask的环境在解释器中可访问，否则会出现outofcontext报错。使用 flask &ndash;app=application.py run以及 flask &ndash;app=application.py shell</p>
+<h1 id="实现了上述事情后你就可以体会到restfulapi的好处">实现了上述事情后你就可以体会到restfulapi的好处</h1>
+<p>在cmd中使用下列代码你就可以删除对应id的酒品（喝掉他）。</p>
+<pre><code>curl -X DELETE http://localhost:5000/drinks/1 
+
+</code></pre>
+<p>在cmd中使用下列代码你就可以新增内容字段。</p>
+<pre><code>curl -X POST http://localhost:5000/drinks \
+     -H &quot;Content-Type: application/json&quot; \
+     -d '{&quot;name&quot;: &quot;Your Drink Name&quot;, &quot;description&quot;: &quot;Your Drink Description&quot;}'
+</code></pre>
+<p>在flask上下文中使用Drink.query.all()或者实际访问对应资源的url就可以验证。确实是确实非常的amazing啊。</p>
+<p>flask源码参考（出处见上文链接）：</p>
+<pre><code>from flask import Flask, request
+from flask_sqlalchemy import SQLAlchemy
+app = Flask(__name__)
+
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
+db = SQLAlchemy(app)
+
+
+class Drink(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), unique=True, nullable=False)
+    description = db.Column(db.String(120))
+
+    def __repr__(self):
+        return f&quot;{self.name} - {self.description}&quot;
+
+
+@app.route('/')
+def index():
+    return 'Hello!'
+
+
+@app.route('/drinks')
+def get_drinks():
+    drinks = Drink.query.all()
+
+    output = []
+    for drink in drinks:
+        drink_data = {'name': drink.name, 'description': drink.description}
+
+        output.append(drink_data)
+
+    return {&quot;drinks&quot;: output}
+
+
+@app.route('/drinks/&lt;id&gt;')
+def get_drink(id):
+    drink = Drink.query.get_or_404(id)
+    return {&quot;name&quot;: drink.name, &quot;description&quot;: drink.description}
+
+
+@app.route('/drinks', methods=['POST'])
+def add_drink():
+    drink = Drink(name=request.json['name'],
+                  description=request.json['description'])
+    db.session.add(drink)
+    db.session.commit()
+    return {'id': drink.id}
+
+
+@app.route('/drinks/&lt;id&gt;', methods=['DELETE'])
+def delete_drink(id):
+    drink = Drink.query.get(id)
+    if drink is None:
+        return {&quot;error&quot;: &quot;not found&quot;}
+    db.session.delete(drink)
+    db.session.commit()
+    return {&quot;message&quot;: &quot;yeet!@&quot;}
+</code></pre>
+
+        
+        ]]>
+      </description>
+    </item>
+    
+  </channel>
+</rss>

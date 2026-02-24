@@ -1,0 +1,48 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>社会 on 李崎滨 | Arua Van</title>
+    <link>https://auravan.top/tags/%E7%A4%BE%E4%BC%9A/</link>
+    <description>Recent content in 社会 on 李崎滨 | Arua Van</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Wed, 09 Oct 2024 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://auravan.top/tags/%E7%A4%BE%E4%BC%9A/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>为什么一周休息两天半</title>
+      <link>https://auravan.top/cn_aura/2024/10/whyrest2inweek/</link>
+      <pubDate>Wed, 09 Oct 2024 00:00:00 +0000</pubDate>
+      
+      <guid>https://auravan.top/cn_aura/2024/10/whyrest2inweek/</guid>
+      <description>
+        <![CDATA[
+        <h1 id="背景">背景</h1>
+<p>为什么一周工作2天半，只休息周六周日和周五后半天？</p>
+<h1 id="e和1-1-e">e和1-1/e</h1>
+<p>仅做验证，不做说明（没想好应该怎么写）
+不妨做如下检验：</p>
+<p><code>$$ 休息时间=\dfrac{1}{e}全部时间 $$</code></p>
+<p>这是广泛验证的生物最佳节律。</p>
+<p>假设人的时间资源均匀分配，天选牛马被老板认可划分的可使用的时间片为<code>$x$</code>次，当被极限压榨$x$次数趋于无穷时。单位时间片$\lambda$始终不会被使用的概率是：</p>
+<p><code>$$ \lim_{x \to \infty} \left(1 - \dfrac{1}{x}\right)^x = \dfrac{1}{e} \approx 0.368 $$</code></p>
+<p>以一周七天为例子，始终不会被打扰的天数为：7*0.368=2.576天;这个休息天数和学校上下学差不多，周五上午就结束学习工作。
+但令人奇怪的是<strong>人类社会为什么会将这些不会打扰的时间统一排到一边</strong>。</p>
+<p>同理，从每周推广至每天，每月，每年。得到如下结论：</p>
+<ul>
+<li>每日休息时间：24*0.368=8.832小时，即每天应该睡八个多小时。</li>
+<li>每月休息日期：30*0.368=11.04天，即每月至少挤出将近1天额外休息</li>
+<li>每年休息日期：134.32天，每年调休加节假日多整合出来的纯休息日不少于134-52*2=30天</li>
+</ul>
+<p>至少从统计角度认为，中国人的休息时间和实际自然情况相比比较吻合。除了每天睡眠的时间是大体上随年龄下降的。</p>
+<p>同理：最佳择偶年龄以预期寿命为期限，70岁为25.76。如果是30岁择偶，那么理论寿命应该是：81.5。中国人的人均寿命达78.6岁，平均择偶年龄应该在：28.9岁。
+这个是结婚界限，至于谈恋爱我的评价是：后半辈子再谈会比较好,毕竟那个才是主战场。</p>
+<h1 id="待续">待续</h1>
+<h1 id="参考资料">参考资料</h1>
+
+        
+        ]]>
+      </description>
+    </item>
+    
+  </channel>
+</rss>

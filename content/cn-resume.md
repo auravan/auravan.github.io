@@ -1,7 +1,7 @@
 ---
 title: 简历
 author: 李崎滨
-date: '2024-9-01'
+date: '2024-09-01'
 lastmod: '2024-09-02'
 slug: cn/resume
 disable_author_date: true
@@ -16,17 +16,20 @@ disable_prismjs: true
 
 # <span class="material-symbols material-symbols-target-outline"></span> 研究兴趣
 
-- 现从事**人脸识别设备**在**各行各业**的**交付**工作。
-- 对**音乐科技**和**数据科学**领域的应用充满兴趣。
+- 现从事**数据分析**相关工作。
+- 对**音乐科技**领域的应用充满兴趣。
 
 # <span class="material-symbols material-symbols-school-outline"></span> 教育背景
 
 - 2019.09 ~ 2023.07 **中国民航大学** 统计学 学士
+- 2021 ~ 2022 **中国传媒大学** 录音艺术 辅修
 
 # <span class="material-symbols material-symbols-groups-outline"></span> 工作经历
 
-1. 2024.08 ~ 至今    [**魔点科技**](https://www.moredian.com/#)初级产品经理 
-2. 2024.03 ~ 2024.06 [**DataMini**](https://www.asktable.com)初级程序员     
+- 2025.10 ~ 2025.11 **渔喵网络** unity工程师
+- 2024.08 ~ 2025.08 [**魔点科技**](https://www.moredian.com/#)初级产品经理 
+- 2024.03 ~ 2024.06 [**DataMini**](https://www.asktable.com)初级程序员    
+ 
 
 # <span class="material-symbols material-symbols-list-alt-outline"></span> 项目经历
 

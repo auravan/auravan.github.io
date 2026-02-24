@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>五度圈 T(7,12) 交互点击版</title>
+    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+    <style>
+        body { margin: 0; padding: 0; background-color: #050505; color: #eee; font-family: sans-serif; overflow: hidden; }
+        #plot { width: 100vw; height: 100vh; }
+        .ui-panel {
+            position: absolute; top: 20px; left: 20px;
+            background: rgba(15, 15, 15, 0.9); padding: 15px;
+            border-radius: 8px; border: 1px solid #444;
+            pointer-events: none; backdrop-filter: blur(10px); z-index: 100;
+        }
+        h2 { margin: 0; font-size: 1.1em; color: #00d4ff; }
+        p { font-size: 0.85em; opacity: 0.8; margin: 8px 0; }
+        .status { color: #ffcc00; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="ui-panel">
+        <h2>五度圈：拓扑交互模型</h2>
+        <p>1. <b>旋转</b>：在空白处点击并拖拽</p>
+        <p>2. <b>选择</b>：直接点击两个<span style="color:#ff6600">音符点</span></p>
+        <p id="msg">当前状态：等待选择起点...</p>
+    </div>
+
+    <div id="plot"></div>
+
+    <script>
+        const R = 2.5, r = 0.8, p = 7, q = 12;
+        const noteNames = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#', 'G#', 'D#', 'A#', 'F'];
+        const colors = ['#FF0000', '#FF6600', '#FFCC00', '#99FF00', '#00FF66', '#00FFFF', '#0066FF', '#6600FF', '#CC00FF', '#FF0099', '#FF0066', '#FF3333'];
+
+        let selectedPoints = [];
+        const traces = [];
+
+        // 1. 生成 12 段纽结线 (索引 0-11)
+        for (let i = 0; i < 12; i++) {
+            let t_s = (2 * Math.PI * i) / 12, t_e = (2 * Math.PI * (i + 1)) / 12;
+            let t_samples = Array.from({length: 31}, (_, j) => t_s + (t_e - t_s) * j / 30);
+            traces.push({
+                x: t_samples.map(t => (R + r * Math.cos(p * t)) * Math.cos(q * t)),
+                y: t_samples.map(t => (R + r * Math.cos(p * t)) * Math.sin(q * t)),
+                z: t_samples.map(t => r * Math.sin(p * t)),
+                type: 'scatter3d', mode: 'lines',
+                line: { color: 'rgba(100, 150, 255, 0.15)', width: 3 },
+                hoverinfo: 'none', showlegend: false
+            });
+        }
+
+        // 2. 音符点 (索引 12)
+        let px=[], py=[], pz=[];
+        noteNames.forEach((_, i) => {
+            let t = (2 * Math.PI * i) / 12;
+            px.push((R + r * Math.cos(p * t)) * Math.cos(q * t));
+            py.push((R + r * Math.cos(p * t)) * Math.sin(q * t));
+            pz.push(r * Math.sin(p * t));
+        });
+        traces.push({
+            x: px, y: py, z: pz,
+            type: 'scatter3d', mode: 'markers+text',
+            marker: { color: colors, size: 8, opacity: 0.9, line: {color:'#fff', width:1} },
+            text: noteNames, textposition: 'top center',
+            textfont: { size: 12, color: '#fff' },
+            hoverinfo: 'text'
+        });
+
+        // 3. 背景环面 (索引 13)
+        // 降低细分以确保拖动流畅
+        let u = Array.from({length: 21}, (_, i) => 2*Math.PI*i/20);
+        let v = Array.from({length: 11}, (_, i) => 2*Math.PI*i/10);
+        let x_s = [], y_s = [], z_s = [];
+        for(let vv of v) {
+            let rx=[], ry=[], rz=[];
+            for(let uu of u) {
+                rx.push((R + r * Math.cos(vv)) * Math.cos(uu));
+                ry.push((R + r * Math.cos(vv)) * Math.sin(uu));
+                rz.push(r * Math.sin(vv));
+            }
+            x_s.push(rx); y_s.push(ry); z_s.push(rz);
+        }
+        traces.push({
+            x: x_s, y: y_s, z: z_s,
+            type: 'surface', opacity: 0.05, showscale: false,
+            colorscale: [[0, '#666'], [1, '#666']], hoverinfo: 'none'
+        });
+
+        const layout = {
+            paper_bgcolor: '#050505',
+            margin: { l:0, r:0, b:0, t:0 },
+            scene: {
+                xaxis: {visible: false}, yaxis: {visible: false}, zaxis: {visible: false},
+                aspectmode: 'data',
+                dragmode: 'rotate' // 显式强制旋转模式
+            }
+        };
+
+        Plotly.newPlot('plot', traces, layout, {displayModeBar: false, scrollZoom: true}).then(gd => {
+            
+            gd.on('plotly_click', data => {
+                // 判断点击的是否是音符点（索引为 12 的 trace）
+                if (data.points[0].curveNumber === 12) {
+                    const ptIdx = data.points[0].pointNumber;
+                    const note = noteNames[ptIdx];
+                    
+                    selectedPoints.push(ptIdx);
+                    document.getElementById('msg').innerText = `已选: ${noteNames[selectedPoints[0]]} ${selectedPoints[1]!==undefined? '-> '+noteNames[selectedPoints[1]] : '...等待第二点'}`;
+
+                    if (selectedPoints.length === 2) {
+                        const [p1, p2] = selectedPoints;
+                        
+                        // 计算这两个点之间是否存在直接的五度连线
+                        // 在五度圈索引中，相邻即五度
+                        let lineToHighlight = -1;
+                        if ((p1 + 1) % 12 === p2) lineToHighlight = p1;
+                        if ((p2 + 1) % 12 === p1) lineToHighlight = p2;
+
+                        if (lineToHighlight !== -1) {
+                            // 高亮逻辑
+                            const lineUpdate = { 'line.color': 'rgba(100, 150, 255, 0.1)', 'line.width': 2 };
+                            Plotly.restyle(gd, lineUpdate, [...Array(12).keys()]); 
+                            Plotly.restyle(gd, { 'line.color': '#00d4ff', 'line.width': 10 }, [lineToHighlight]);
+                            
+                            const mSize = Array(12).fill(8);
+                            const mOpac = Array(12).fill(0.2);
+                            mSize[p1] = mSize[p2] = 20;
+                            mOpac[p1] = mOpac[p2] = 1;
+                            Plotly.restyle(gd, { 'marker.size': mSize, 'marker.opacity': mOpac }, [12]);
+                            
+                            document.getElementById('msg').innerHTML = `<span style="color:#00ff88">已连接: ${noteNames[p1]} - ${noteNames[p2]} (纯五度)</span>`;
+                        } else {
+                            document.getElementById('msg').innerHTML = `<span style="color:#ff4444">非直接五度关联，请重新选择</span>`;
+                            // 重置
+                            setTimeout(resetPlot, 1000);
+                        }
+                        selectedPoints = [];
+                    }
+                }
+            });
+
+            // 点击空白处重置
+            gd.on('plotly_doubleclick', resetPlot);
+
+            function resetPlot() {
+                Plotly.restyle(gd, { 'line.color': 'rgba(100, 150, 255, 0.15)', 'line.width': 3 }, [...Array(12).keys()]);
+                Plotly.restyle(gd, { 'marker.size': 8, 'marker.opacity': 0.9 }, [12]);
+                selectedPoints = [];
+                document.getElementById('msg').innerText = "当前状态：等待选择起点...";
+            }
+        });
+    </script>
+</body>
+</html>
