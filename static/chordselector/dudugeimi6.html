@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>3D 和弦实验室 · 强耦合联动</title>
+    <style>
+        :root {
+            --bg-color: #050505;
+            --disk-height: 60px;
+            --disk-radius: 180px;
+            --note-width: 96px; 
+            --accent-root: #ffcc00;
+            --accent-third: #ff66aa;
+            --accent-fifth: #66ccff;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: white;
+            margin: 0;
+            height: 100vh;
+            font-family: 'Segoe UI', sans-serif;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* 和弦选择器样式 */
+        .chord-selector {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 200;
+            background: rgba(20,20,20,0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid #444;
+            border-radius: 40px;
+            padding: 8px 16px;
+            display: flex;
+            gap: 8px;
+            box-shadow: 0 0 20px rgba(0,255,255,0.2);
+        }
+        .chord-selector label {
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: 0.3s;
+            color: #888;
+        }
+        .chord-selector label.selected {
+            background: #333;
+            color: var(--accent-third);
+            box-shadow: inset 0 0 5px rgba(255,102,170,0.5);
+        }
+        .chord-selector input { display: none; }
+
+        #viewport {
+            width: 100vw;
+            height: 100vh;
+            perspective: 1200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #world {
+            position: relative;
+            transform-style: preserve-3d;
+            transform: rotateX(-15deg) rotateY(0deg);
+        }
+
+        /* 准星指示器 */
+        .guide {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) translateZ(240px);
+            width: var(--note-width);
+            height: 200px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 4px;
+            pointer-events: none;
+        }
+
+        .ring {
+            position: relative;
+            width: 0; height: var(--disk-height);
+            transform-style: preserve-3d;
+            margin: 4px 0;
+            cursor: grab;
+        }
+
+        .ring[data-role="root"] .note-panel { border-color: var(--accent-root); color: var(--accent-root); }
+        .ring[data-role="third"] .note-panel { border-color: var(--accent-third); color: var(--accent-third); }
+        .ring[data-role="fifth"] .note-panel { border-color: var(--accent-fifth); color: var(--accent-fifth); }
+
+        .note-panel {
+            position: absolute;
+            width: var(--note-width);
+            height: var(--disk-height);
+            left: calc(var(--note-width) / -2);
+            background: #111;
+            border: 1px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.4rem;
+            backface-visibility: hidden;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="chord-selector">
+        <label class="selected"><input type="radio" name="chord" value="major" checked>大三</label>
+        <label><input type="radio" name="chord" value="minor">小三</label>
+        <label><input type="radio" name="chord" value="dom7">属七</label>
+        <label><input type="radio" name="chord" value="dim7">减七</label>
+    </div>
+
+    <div id="viewport">
+        <div class="guide"></div>
+        <div id="world"></div>
+    </div>
+
+    <script>
+        const notes = ["C", "G", "D", "A", "E", "B", "Gb", "Db", "Ab", "Eb", "Bb", "F"];
+        const world = document.getElementById('world');
+        const intervals = {
+            major: [0, 4, 1],    // C-E-G
+            minor: [0, 9, 1],    // C-Eb-G (五度圈索引)
+            dom7:  [0, 4, 10],   // C-E-Bb
+            dim7:  [0, 9, 6]     // C-Eb-Gb
+        };
+
+        let currentType = 'major';
+        let ringAngles = [0, 120, 30]; // 初始角度
+        let startX, startY, viewX = -15, viewY = 0;
+        let activeRingIndex = null;
+
+        // 初始化
+        for (let r = 0; r < 3; r++) {
+            const ring = document.createElement('div');
+            ring.className = 'ring';
+            ring.id = `ring-${r}`;
+            ring.dataset.role = r === 0 ? 'root' : (r === 1 ? 'third' : 'fifth');
+            notes.forEach((note, i) => {
+                const p = document.createElement('div');
+                p.className = 'note-panel';
+                p.innerText = note;
+                p.style.transform = `rotateY(${-i * 30}deg) translateZ(180px)`;
+                ring.appendChild(p);
+            });
+            world.appendChild(ring);
+        }
+
+        function updateTransform(useAnim = false) {
+            for (let i = 0; i < 3; i++) {
+                const el = document.getElementById(`ring-${i}`);
+                el.style.transition = useAnim ? "transform 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28)" : "none";
+                el.style.transform = `rotateY(${ringAngles[i]}deg)`;
+            }
+        }
+
+        // 核心逻辑：计算和弦正确的相对角度
+        function syncAnglesFromRoot(rootAngle) {
+            const rootIdx = Math.round(rootAngle / 30);
+            const offsets = intervals[currentType];
+            return [
+                rootAngle,
+                (rootIdx + offsets[1]) * 30,
+                (rootIdx + offsets[2]) * 30
+            ];
+        }
+
+        window.onmousedown = (e) => {
+            startX = e.clientX; startY = e.clientY;
+            const hit = e.target.closest('.ring');
+            activeRingIndex = hit ? parseInt(hit.id.split('-')[1]) : -1;
+        };
+
+        window.onmousemove = (e) => {
+            if (startX === undefined) return;
+            const dx = (e.clientX - startX) * 0.5;
+            const dy = (e.clientY - startY) * 0.5;
+
+            if (activeRingIndex >= 0) {
+                // 1. 先让所有环同步移动相同的物理位移（保持当前的相对视觉关系）
+                for (let i = 0; i < 3; i++) {
+                    ringAngles[i] += dx;
+                }
+                updateTransform(false);
+            } else {
+                viewY += dx; viewX = Math.max(-40, Math.min(40, viewX - dy));
+                world.style.transform = `rotateX(${viewX}deg) rotateY(${viewY}deg)`;
+            }
+            startX = e.clientX; startY = e.clientY;
+        };
+
+        window.onmouseup = () => {
+            if (activeRingIndex >= 0) {
+                // 2. 松开时，根据“被拖动那一层”的位置，推算出标准的根音位置
+                const currentAngle = ringAngles[activeRingIndex];
+                const noteIdx = (Math.round(currentAngle / 30) % 12 + 12) % 12;
+                
+                // 根据被拖动层角色逆推根音索引
+                const offset = intervals[currentType][activeRingIndex];
+                const rootIdx = (noteIdx - offset + 12) % 12;
+                
+                // 3. 重新计算三层的标准对齐角度
+                const baseRootAngle = Math.round(ringAngles[0] / 30) * 30; // 粗略参考
+                // 修正：寻找离当前物理位置最近的标准根音角度
+                const finalRootAngle = Math.round((ringAngles[activeRingIndex] - offset * 30) / 30) * 30;
+                
+                ringAngles = [
+                    finalRootAngle,
+                    finalRootAngle + intervals[currentType][1] * 30,
+                    finalRootAngle + intervals[currentType][2] * 30
+                ];
+                updateTransform(true);
+            }
+            startX = undefined;
+        };
+
+        // 切换和弦
+        document.querySelectorAll('input').forEach(input => {
+            input.onchange = (e) => {
+                currentType = e.target.value;
+                document.querySelectorAll('label').forEach(l => l.classList.remove('selected'));
+                e.target.parentElement.classList.add('selected');
+                // 以当前第一行为基准重算
+                const rootIdx = (Math.round(ringAngles[0] / 30) % 12 + 12) % 12;
+                const rootAngle = Math.round(ringAngles[0] / 30) * 30;
+                ringAngles = [
+                    rootAngle,
+                    rootAngle + intervals[currentType][1] * 30,
+                    rootAngle + intervals[currentType][2] * 30
+                ];
+                updateTransform(true);
+            };
+        });
+
+        updateTransform();
+    </script>
+</body>
+</html>

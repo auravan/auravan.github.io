@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>3D 音乐密码筒 - 顶级联动控制</title>
+    <style>
+        :root {
+            --bg-color: #050505;
+            --disk-height: 60px;
+            --disk-radius: 180px;
+            --note-width: 96px; 
+            --accent-master: #ffcc00; /* 主音盘用金色 */
+            --accent-sub: #00ffcc;    /* 其他盘用青色 */
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: white;
+            margin: 0;
+            height: 100vh;
+            font-family: 'Segoe UI', sans-serif;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            position: absolute;
+            top: 20px;
+            z-index: 100;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        h2 { margin: 0; letter-spacing: 5px; color: var(--accent-master); }
+        .hint { font-size: 0.8rem; opacity: 0.5; }
+
+        /* 3D 舞台 */
+        #viewport {
+            width: 100vw;
+            height: 100vh;
+            perspective: 1200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
+        }
+
+        /* 视角旋转容器 */
+        #world {
+            position: relative;
+            transform-style: preserve-3d;
+            transform: rotateX(-15deg) rotateY(0deg);
+        }
+
+        /* ⚠️ 绿色框框已被彻底移除 — 不再有 .guide-overlay 样式和元素 */
+
+        /* 圆环通用样式 */
+        .ring {
+            position: relative;
+            width: 0; height: var(--disk-height);
+            transform-style: preserve-3d;
+            margin: 4px 0;
+            cursor: grab;
+        }
+
+        /* 顶层主音盘特殊样式 */
+        .ring.master-ring .note-panel {
+            background: linear-gradient(135deg, #443300 0%, #111 100%);
+            border: 1px solid var(--accent-master);
+            color: var(--accent-master);
+        }
+
+        .note-panel {
+            position: absolute;
+            width: var(--note-width);
+            height: var(--disk-height);
+            left: calc(var(--note-width) / -2);
+            background: linear-gradient(135deg, #222 0%, #111 100%);
+            border: 1px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.5rem;
+            backface-visibility: hidden;
+            box-sizing: border-box;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h2>CORE HARMONY</h2>
+        <p class="hint">顶部金色盘：整体转调 | 下方青色盘：独立调节</p>
+    </div>
+
+    <div id="viewport">
+        <!-- 绿色框框 .guide-overlay 已经删除，只留下纯粹的3D世界 -->
+        <div id="world">
+            <!-- 所有圆环将由JS动态生成 -->
+        </div>
+    </div>
+
+    <script>
+        const notes = ["C", "G", "D", "A", "E", "B", "Gb", "Db", "Ab", "Eb", "Bb", "F"];
+        const ringCount = 5; // 1个Master + 4个Sub
+        const world = document.getElementById('world');
+        
+        let viewRotX = -15;
+        let viewRotY = 0;
+        let activeRingIndex = null; 
+        let startX, startY;
+        let ringAngles = new Array(ringCount).fill(0);
+
+        function init() {
+            for (let r = 0; r < ringCount; r++) {
+                const ring = document.createElement('div');
+                ring.className = 'ring' + (r === 0 ? ' master-ring' : '');
+                ring.id = 'ring-' + r;
+                
+                notes.forEach((note, i) => {
+                    const panel = document.createElement('div');
+                    panel.className = 'note-panel';
+                    panel.innerText = note;
+                    const angle = i * 30;
+                    panel.style.transform = `rotateY(${-angle}deg) translateZ(180px)`;
+                    ring.appendChild(panel);
+                });
+                world.appendChild(ring);
+            }
+        }
+
+        window.onmousedown = (e) => {
+            startX = e.clientX;
+            startY = e.clientY;
+            const hit = e.target.closest('.ring');
+            if (hit) {
+                // 获取当前点击的是第几个环
+                activeRingIndex = parseInt(hit.id.split('-')[1]);
+                hit.style.transition = "none";
+            } else {
+                activeRingIndex = -1; // -1 代表旋转背景
+            }
+        };
+
+        window.onmousemove = (e) => {
+            if (startX === undefined) return;
+            const deltaX = e.clientX - startX;
+            const deltaY = e.clientY - startY;
+
+            if (activeRingIndex === 0) {
+                // --- 核心逻辑：主音盘带动全体 ---
+                const moveAngle = deltaX * 0.5;
+                for (let i = 0; i < ringCount; i++) {
+                    ringAngles[i] += moveAngle;
+                    document.getElementById('ring-' + i).style.transform = `rotateY(${ringAngles[i]}deg)`;
+                }
+            } 
+            else if (activeRingIndex > 0) {
+                // --- 个别圆盘旋转 ---
+                ringAngles[activeRingIndex] += deltaX * 0.5;
+                document.getElementById('ring-' + activeRingIndex).style.transform = `rotateY(${ringAngles[activeRingIndex]}deg)`;
+            } 
+            else if (activeRingIndex === -1) {
+                // --- 旋转视角 ---
+                viewRotY += deltaX * 0.5;
+                viewRotX = Math.max(-40, Math.min(40, viewRotX - deltaY * 0.5));
+                world.style.transform = `rotateX(${viewRotX}deg) rotateY(${viewRotY}deg)`;
+            }
+
+            startX = e.clientX;
+            startY = e.clientY;
+        };
+
+        window.onmouseup = () => {
+            // 吸附功能
+            if (activeRingIndex >= 0) {
+                if (activeRingIndex === 0) {
+                    // 全体吸附
+                    ringAngles.forEach((ang, i) => {
+                        const snapped = Math.round(ang / 30) * 30;
+                        ringAngles[i] = snapped;
+                        const el = document.getElementById('ring-' + i);
+                        el.style.transition = "transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
+                        el.style.transform = `rotateY(${snapped}deg)`;
+                    });
+                } else {
+                    // 单个吸附
+                    const snapped = Math.round(ringAngles[activeRingIndex] / 30) * 30;
+                    ringAngles[activeRingIndex] = snapped;
+                    const el = document.getElementById('ring-' + activeRingIndex);
+                    el.style.transition = "transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
+                    el.style.transform = `rotateY(${snapped}deg)`;
+                }
+            }
+            startX = undefined;
+            activeRingIndex = null;
+        };
+
+        init();
+    </script>
+</body>
+</html>

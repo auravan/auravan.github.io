@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>3D 和弦实验室 · 平滑联动</title>
+    <style>
+        :root {
+            --bg-color: #050505;
+            --disk-height: 60px;
+            --disk-radius: 180px;
+            --note-width: 96px; 
+            --accent-root: #ffcc00;
+            --accent-second: #ffaa66;
+            --accent-third: #ff66aa;
+            --accent-fifth: #66ccff;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: white;
+            margin: 0;
+            height: 100vh;
+            font-family: 'Segoe UI', sans-serif;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            position: absolute;
+            top: 20px;
+            z-index: 100;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        h2 { margin: 0; letter-spacing: 5px; color: var(--accent-root); }
+        
+        .chord-selector {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 200;
+            background: rgba(20,20,20,0.8);
+            backdrop-filter: blur(8px);
+            border: 1px solid #444;
+            border-radius: 40px;
+            padding: 8px 16px;
+            display: flex;
+            gap: 12px;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            box-shadow: 0 0 20px rgba(0,255,255,0.2);
+            pointer-events: auto;
+        }
+        .chord-selector label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: #aaa;
+            cursor: pointer;
+            transition: 0.2s;
+            padding: 4px 8px;
+            border-radius: 30px;
+        }
+        .chord-selector label.selected {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            text-shadow: 0 0 8px cyan;
+        }
+        .chord-selector input[type="radio"] {
+            appearance: none;
+            width: 0;
+            margin: 0;
+        }
+
+        .hint {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 0.8rem;
+            opacity: 0.5;
+            color: #ccc;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        #viewport {
+            width: 100vw;
+            height: 100vh;
+            perspective: 1200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
+        }
+
+        #world {
+            position: relative;
+            transform-style: preserve-3d;
+            transform: rotateX(-15deg) rotateY(0deg);
+        }
+
+        .ring {
+            position: relative;
+            width: 0; height: var(--disk-height);
+            transform-style: preserve-3d;
+            margin: 4px 0;
+            cursor: grab;
+        }
+
+        .ring[data-role="root"] .note-panel {
+            border: 2px solid var(--accent-root);
+            color: var(--accent-root);
+            background: linear-gradient(135deg, #332200 0%, #111 100%);
+            box-shadow: 0 0 15px rgba(255,204,0,0.3);
+        }
+        .ring[data-role="third"] .note-panel {
+            border: 2px solid var(--accent-third);
+            color: var(--accent-third);
+            background: linear-gradient(135deg, #331122 0%, #111 100%);
+            box-shadow: 0 0 15px rgba(255,102,170,0.3);
+        }
+        .ring[data-role="fifth"] .note-panel {
+            border: 2px solid var(--accent-fifth);
+            color: var(--accent-fifth);
+            background: linear-gradient(135deg, #112233 0%, #111 100%);
+            box-shadow: 0 0 15px rgba(102,204,255,0.3);
+        }
+
+        .note-panel {
+            position: absolute;
+            width: var(--note-width);
+            height: var(--disk-height);
+            left: calc(var(--note-width) / -2);
+            background: linear-gradient(135deg, #222 0%, #111 100%);
+            border: 1px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.5rem;
+            backface-visibility: hidden;
+            box-sizing: border-box;
+            color: #888;
+            text-shadow: 0 0 8px currentColor;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="chord-selector">
+        <label class="selected">
+            <input type="radio" name="chordType" value="major" checked> <span>大三</span>
+        </label>
+        <label>
+            <input type="radio" name="chordType" value="minor"> <span>小三</span>
+        </label>
+        <label>
+            <input type="radio" name="chordType" value="dominant7"> <span>属七</span>
+        </label>
+        <label>
+            <input type="radio" name="chordType" value="dim7"> <span>减七</span>
+        </label>
+        <label>
+            <input type="radio" name="chordType" value="sus4"> <span>挂留</span>
+        </label>
+    </div>
+
+    <div class="header">
+        <h2>HARMONY LAB</h2>
+    </div>
+    <div class="hint">拖动任意圆盘 — 所有圆盘平滑跟随，保持和弦音程</div>
+
+    <div id="viewport">
+        <div id="world"></div>
+    </div>
+
+    <script>
+        (function() {
+            const notes = ["C", "G", "D", "A", "E", "B", "Gb", "Db", "Ab", "Eb", "Bb", "F"];
+            const ringCount = 3;
+            const world = document.getElementById('world');
+            
+            let viewRotX = -15;
+            let viewRotY = 0;
+            let activeRingIndex = null; 
+            let startX, startY;
+            
+            // 当前角度 [根音, 第二音, 第三音]
+            let ringAngles = [0, 120, 30]; // 默认C大三: C(0°), E(120°), G(30°)
+            
+            // 当前和弦类型
+            let currentChordType = 'major';
+
+            // 您提供的正确音程关系
+            function getIntervalsFromType(type) {
+                switch(type) {
+                    case 'major':     return [0, 4, 1];      // 大三: C, E, G
+                    case 'minor':     return [0, 9, 1];      // 小三: C, A, G
+                    case 'dominant7': return [0, 4, 10];     // 属七: C, E, Bb
+                    case 'dim7':      return [0, 9, 6];      // 减七: C, A, F#
+                    case 'sus4':      return [0, 11, 1];     // 挂留: C, B, G
+                    default: return [0, 4, 1];
+                }
+            }
+
+            // 根据根音索引和类型返回三个环的目标角度
+            function getTargetAngles(rootIdx, type) {
+                const intervals = getIntervalsFromType(type);
+                return [
+                    (rootIdx + intervals[0]) % 12 * 30,
+                    (rootIdx + intervals[1]) % 12 * 30,
+                    (rootIdx + intervals[2]) % 12 * 30
+                ];
+            }
+
+            // 从环的角色和当前音符索引推算出根音
+            function getRootFromActive(activeIdx, noteIdx, type) {
+                const intervals = getIntervalsFromType(type);
+                if (activeIdx === 0) return noteIdx;
+                return (noteIdx - intervals[activeIdx] + 12) % 12;
+            }
+
+            // 工具函数
+            function normalizeAngle(angle) {
+                return ((angle % 360) + 360) % 360;
+            }
+            
+            function getNoteIndex(angle) {
+                return Math.round(normalizeAngle(angle) / 30) % 12;
+            }
+
+            // 计算最短旋转路径的目标角度
+            function getShortestTarget(current, target) {
+                let diff = ((target - current + 540) % 360) - 180;
+                return current + diff;
+            }
+
+            // 更新所有环的transform (平滑版)
+            function updateRingsWithTargets(targetAngles, useTransition = true) {
+                for (let i = 0; i < ringCount; i++) {
+                    const el = document.getElementById('ring-' + i);
+                    if (!el) continue;
+                    
+                    // 计算最短路径的目标角度
+                    const target = getShortestTarget(ringAngles[i], targetAngles[i]);
+                    ringAngles[i] = target;
+                    
+                    if (useTransition) {
+                        el.style.transition = "transform 0.2s linear";
+                    } else {
+                        el.style.transition = "none";
+                    }
+                    el.style.transform = `rotateY(${ringAngles[i]}deg)`;
+                }
+            }
+
+            // 初始化环
+            function initRings() {
+                for (let r = 0; r < ringCount; r++) {
+                    const ring = document.createElement('div');
+                    ring.className = 'ring';
+                    ring.id = 'ring-' + r;
+                    
+                    if (r === 0) ring.setAttribute('data-role', 'root');
+                    else if (r === 1) ring.setAttribute('data-role', 'third');
+                    else ring.setAttribute('data-role', 'fifth');
+
+                    notes.forEach((note, i) => {
+                        const panel = document.createElement('div');
+                        panel.className = 'note-panel';
+                        panel.innerText = note;
+                        const angle = i * 30;
+                        panel.style.transform = `rotateY(${-angle}deg) translateZ(180px)`;
+                        ring.appendChild(panel);
+                    });
+                    world.appendChild(ring);
+                }
+                
+                // 设置为C大三和弦
+                const targetAngles = getTargetAngles(0, 'major');
+                ringAngles = [...targetAngles];
+                updateRingsWithTargets(targetAngles, false);
+            }
+
+            // 响应和弦类型变更
+            function onChordTypeChange(newType) {
+                currentChordType = newType;
+                const rootIdx = getNoteIndex(ringAngles[0]);
+                const targetAngles = getTargetAngles(rootIdx, newType);
+                updateRingsWithTargets(targetAngles, true);
+            }
+
+            // 监听radio变化
+            function setupChordSelector() {
+                const radios = document.querySelectorAll('input[name="chordType"]');
+                radios.forEach(radio => {
+                    radio.addEventListener('change', (e) => {
+                        document.querySelectorAll('.chord-selector label').forEach(l => l.classList.remove('selected'));
+                        e.target.closest('label').classList.add('selected');
+                        onChordTypeChange(e.target.value);
+                    });
+                });
+            }
+
+            // 鼠标按下
+            window.onmousedown = (e) => {
+                startX = e.clientX;
+                startY = e.clientY;
+                const hit = e.target.closest('.ring');
+                if (hit) {
+                    activeRingIndex = parseInt(hit.id.split('-')[1]);
+                    // 拖动时关闭过渡，实现即时响应
+                    for (let i = 0; i < ringCount; i++) {
+                        document.getElementById('ring-' + i).style.transition = "none";
+                    }
+                } else {
+                    activeRingIndex = -1;
+                }
+            };
+
+            // 鼠标移动 - 平滑联动核心
+            window.onmousemove = (e) => {
+                if (startX === undefined) return;
+                const deltaX = e.clientX - startX;
+                const deltaY = e.clientY - startY;
+
+                if (activeRingIndex >= 0 && activeRingIndex < ringCount) {
+                    // 移动被拖动的环
+                    const moveAngle = deltaX * 0.5;
+                    ringAngles[activeRingIndex] += moveAngle;
+                    
+                    // 获取当前被拖动环指向的音符索引
+                    const currentNoteIdx = getNoteIndex(ringAngles[activeRingIndex]);
+                    
+                    // 推算根音
+                    const newRootIdx = getRootFromActive(activeRingIndex, currentNoteIdx, currentChordType);
+                    
+                    // 计算所有环的目标角度（基于新根音）
+                    const targetAngles = getTargetAngles(newRootIdx, currentChordType);
+                    
+                    // 关键修复：所有环都平滑移动，不跳变
+                    for (let i = 0; i < ringCount; i++) {
+                        if (i === activeRingIndex) {
+                            // 被拖动环直接应用当前角度
+                            document.getElementById('ring-' + i).style.transform = `rotateY(${ringAngles[i]}deg)`;
+                        } else {
+                            // 非拖动环：计算最短路径，平滑移动到目标角度
+                            const target = getShortestTarget(ringAngles[i], targetAngles[i]);
+                            ringAngles[i] = target;
+                            document.getElementById('ring-' + i).style.transform = `rotateY(${ringAngles[i]}deg)`;
+                        }
+                    }
+                } 
+                else if (activeRingIndex === -1) {
+                    // 旋转视角
+                    viewRotY += deltaX * 0.5;
+                    viewRotX = Math.max(-40, Math.min(40, viewRotX - deltaY * 0.5));
+                    world.style.transform = `rotateX(${viewRotX}deg) rotateY(${viewRotY}deg)`;
+                }
+
+                startX = e.clientX;
+                startY = e.clientY;
+            };
+
+            // 鼠标松开 - 吸附到精确音名
+            window.onmouseup = () => {
+                if (activeRingIndex >= 0 && activeRingIndex < ringCount) {
+                    // 基于当前被拖动环的位置，计算最终根音
+                    const finalNoteIdx = getNoteIndex(ringAngles[activeRingIndex]);
+                    const finalRootIdx = getRootFromActive(activeRingIndex, finalNoteIdx, currentChordType);
+                    
+                    // 计算精确的量化角度
+                    const finalAngles = getTargetAngles(finalRootIdx, currentChordType);
+                    
+                    // 平滑吸附到精确位置
+                    for (let i = 0; i < ringCount; i++) {
+                        const el = document.getElementById('ring-' + i);
+                        const target = finalAngles[i];
+                        const current = ringAngles[i];
+                        
+                        // 使用最短路径
+                        ringAngles[i] = getShortestTarget(current, target);
+                        
+                        el.style.transition = "transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.2)";
+                        el.style.transform = `rotateY(${ringAngles[i]}deg)`;
+                    }
+                }
+                startX = undefined;
+                activeRingIndex = null;
+            };
+
+            // 启动
+            initRings();
+            setupChordSelector();
+        })();
+    </script>
+</body>
+</html>

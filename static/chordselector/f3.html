@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>3D 爵士实验室 · 紧凑堆叠版</title>
+    <style>
+        :root {
+            --bg-color: #050505; --disk-height: 52px; --note-width: 110px; 
+            --color-root: #ffcc00; --color-3rd: #ffffff; --color-7th: #00ffcc; 
+            --color-ext: #ff4488; --color-dim: #333333;
+        }
+        body { background-color: var(--bg-color); color: white; margin: 0; height: 100vh; font-family: 'Segoe UI', sans-serif; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .panel-container { position: absolute; width: 100%; height: 100%; display: flex; justify-content: space-between; padding: 25px; box-sizing: border-box; pointer-events: none; z-index: 100; }
+        .menu-group { background: rgba(15,15,15,0.92); border: 1px solid #444; border-radius: 12px; padding: 15px; display: grid; gap: 8px; pointer-events: auto; backdrop-filter: blur(15px); align-self: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        
+        .mode-selector { display: flex; background: #222; border-radius: 6px; padding: 2px; margin-bottom: 10px; }
+        .mode-btn { flex: 1; padding: 8px 4px; border: none; background: none; color: #666; font-size: 0.65rem; cursor: pointer; border-radius: 4px; transition: 0.2s; font-weight: bold; }
+        .mode-btn.active { background: #444; color: var(--color-7th); }
+
+        .left-panel { display: flex; flex-direction: column; gap: 20px; }
+        .chord-grid { grid-template-columns: repeat(2, 100px); }
+        .right-panel { width: 150px; }
+        .octave-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #333; }
+        .octave-label { font-size: 0.7rem; color: #aaa; width: 45px; font-weight: bold; }
+        .oct-btn { width: 26px; height: 26px; background: #222; border: 1px solid #555; color: white; cursor: pointer; border-radius: 4px; }
+        .oct-val { font-size: 0.9rem; width: 20px; text-align: center; color: var(--color-7th); font-family: monospace; }
+        
+        label { padding: 10px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; text-align: center; border: 1px solid #222; transition: 0.2s; color: #666; background: #111; }
+        label.selected { background: #333; border-color: var(--color-7th); color: white; }
+        input { display: none; }
+
+        #viewport { width: 100vw; height: 100vh; perspective: 1200px; display: flex; align-items: center; justify-content: center; cursor: crosshair; }
+        #world { position: relative; transform-style: preserve-3d; transform: rotateX(-8deg); height: 400px; width: 0; pointer-events: none; }
+        .ring { position: absolute; width: 0; height: var(--disk-height); transform-style: preserve-3d; transition: transform 0.5s cubic-bezier(0.18,0.89,0.32,1.2), top 0.6s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s; }
+        .note-panel { position: absolute; width: var(--note-width); height: var(--disk-height); left: calc(var(--note-width)/-2); background: #0a0a0a; border: 1.5px solid #222; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: bold; font-size: 1.4rem; backface-visibility: hidden; pointer-events: auto; cursor: pointer; }
+        #guide { position: absolute; width: calc(var(--note-width) + 12px); border: 2px solid var(--color-root); left: calc((var(--note-width) + 12px) / -2); top: -3px; transform: translateZ(265px); border-radius: 4px; pointer-events: none; }
+    </style>
+</head>
+<body>
+    <div class="panel-container">
+        <div class="left-panel">
+            <div class="menu-group chord-grid" id="chordMenu"></div>
+            <div class="menu-group" id="invMenu" style="grid-template-columns: repeat(2, 100px);"></div>
+        </div>
+        <div class="menu-group right-panel">
+            <div class="mode-selector">
+                <button class="mode-btn active" onclick="setPlayMode('Single', this)">SINGLE</button>
+                <button class="mode-btn" onclick="setPlayMode('Chord', this)">CHORD</button>
+            </div>
+            <div id="octaveMenu"></div>
+            <div style="font-size: 0.55rem; color: #555; text-align: center; margin-top: 10px; letter-spacing: 1px;">LOW (TOP) ⮕ HIGH (BOTTOM)</div>
+        </div>
+    </div>
+    <div id="viewport" onclick="handleViewportClick(event)"><div id="world"><div id="guide"></div></div></div>
+
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const chromaticScale = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
+        const notesMap = ["C", "G", "D", "A", "E", "B", "Gb", "Db", "Ab", "Eb", "Bb", "F"];
+        const chordLib = { "Maj7": [0,4,1,5,null,null], "m7": [0,9,1,10,null,null], "Dom7": [0,4,1,10,null,null], "dim7": [0,9,6,3,null,null], "m9": [0,9,1,10,2,null], "7#11": [0,4,1,10,2,6], "7b13": [0,4,1,10,2,8] };
+        
+        let ringOctaves = [0, 0, 0, 0, 0, 0];
+        let playMode = 'Single';
+        let globalBaseRotation = 0, ringAngles = new Array(6).fill(0), currentChord = "Maj7", currentInv = 0, isDragging = false, totalMoved = 0, startX, dragOffset = 0;
+
+        function setPlayMode(mode, btn) {
+            playMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        function playTone(freq, isBass, duration = 1.4) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = isBass ? 'sine' : 'triangle';
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(isBass ? 0.22 : 0.08, audioCtx.currentTime + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + duration);
+        }
+
+        // --- 核心重构：动态最近堆叠算法 ---
+        function getChordLayout() {
+            const offsets = chordLib[currentChord];
+            const ringOrder = [0, 1, 2, 3, 4, 5];
+            if (currentInv === 1) [ringOrder[0], ringOrder[1], ringOrder[2], ringOrder[3]] = [1, 2, 3, 0];
+            if (currentInv === 2) [ringOrder[0], ringOrder[1], ringOrder[2], ringOrder[3]] = [2, 3, 0, 1];
+            if (currentInv === 3) [ringOrder[0], ringOrder[1], ringOrder[2], ringOrder[3]] = [3, 0, 1, 2];
+
+            const activeRings = [];
+            offsets.forEach((offset, i) => { if (offset !== null) activeRings.push({ ringIdx: i, vPos: ringOrder.indexOf(i), offset: offset }); });
+            activeRings.sort((a, b) => a.vPos - b.vPos);
+
+            let lastMidi = 0;
+            const layout = {};
+
+            activeRings.forEach((ring, i) => {
+                const noteName = notesMap[(Math.round(globalBaseRotation / 30) + ring.offset + 1200) % 12];
+                const semitoneIdx = chromaticScale.indexOf(noteName);
+
+                let currentMidi;
+                if (i === 0) {
+                    currentMidi = 48 + semitoneIdx; // 顶部低音起始
+                } else {
+                    // 贪婪搜索：找到比上一个音高的最近的那个音
+                    currentMidi = lastMidi + 1;
+                    while (currentMidi % 12 !== semitoneIdx) {
+                        currentMidi++;
+                    }
+                }
+                
+                // 叠加面板八度控制
+                const finalMidi = currentMidi + (ringOctaves[ring.ringIdx] * 12);
+                lastMidi = finalMidi;
+                layout[ring.ringIdx] = 440 * Math.pow(2, (finalMidi - 69) / 12);
+            });
+            return layout;
+        }
+
+        function playChordFromVisual() {
+            const layout = getChordLayout();
+            const ringOrder = [0, 1, 2, 3, 4, 5]; // 仅用于判断谁是Bass
+            if (currentInv === 1) [ringOrder[0], ringOrder[1], ringOrder[2], ringOrder[3]] = [1, 2, 3, 0];
+            if (currentInv === 2) [ringOrder[0], ringOrder[1], ringOrder[2], ringOrder[3]] = [2, 3, 0, 1];
+            if (currentInv === 3) [ringOrder[0], ringOrder[1], ringOrder[2], ringOrder[3]] = [3, 0, 1, 2];
+
+            for (const [ringIdx, freq] of Object.entries(layout)) {
+                playTone(freq, ringOrder.indexOf(parseInt(ringIdx)) === 0);
+            }
+        }
+
+        function handleNoteClick(note, ringIdx) {
+            if (totalMoved > 5) return;
+            if (playMode === 'Chord') {
+                playChordFromVisual();
+            } else {
+                const layout = getChordLayout();
+                if (layout[ringIdx]) {
+                    const ringOrder = [0,1,2,3,4,5];
+                    if (currentInv === 1) [ringOrder[0], ringOrder[1], ringOrder[2], ringOrder[3]] = [1, 2, 3, 0];
+                    playTone(layout[ringIdx], ringOrder.indexOf(ringIdx) === 0);
+                }
+            }
+        }
+
+        function initMenus() {
+            const cMenu = document.getElementById('chordMenu');
+            Object.keys(chordLib).forEach(type => {
+                const lbl = document.createElement('label'); lbl.id = `type-${type}`;
+                lbl.innerHTML = `<input type="radio" name="c">${type}`;
+                lbl.onclick = (e) => { e.stopPropagation(); currentChord = type; update(true, true); };
+                cMenu.appendChild(lbl);
+            });
+            const iMenu = document.getElementById('invMenu');
+            ["Root", "1st", "2nd", "3rd"].forEach((name, i) => {
+                const lbl = document.createElement('label'); lbl.id = `inv-${i}`;
+                lbl.innerHTML = `<input type="radio" name="i">${name}`;
+                lbl.onclick = (e) => { e.stopPropagation(); currentInv = i; update(true, true); };
+                iMenu.appendChild(lbl);
+            });
+            const oMenu = document.getElementById('octaveMenu');
+            ["R0 (Root)", "R1 (3rd)", "R2 (5th)", "R3 (7th)", "R4 (9th)", "R5 (Ext)"].forEach((name, i) => {
+                const row = document.createElement('div'); row.className = 'octave-row';
+                row.innerHTML = `<div class="octave-label">${name}</div><div class="octave-ctrl"><button class="oct-btn" onclick="changeOctave(${i},-1)">-</button><div class="oct-val" id="oct-v-${i}">${ringOctaves[i]}</div><button class="oct-btn" onclick="changeOctave(${i},1)">+</button></div>`;
+                oMenu.appendChild(row);
+            });
+        }
+
+        window.changeOctave = (idx, dir) => { event.stopPropagation(); ringOctaves[idx] = Math.max(-2, Math.min(2, ringOctaves[idx] + dir)); document.getElementById(`oct-v-${idx}`).innerText = ringOctaves[idx]; update(false, true); };
+        function handleViewportClick(e) { if (e && e.target.closest('.menu-group') || totalMoved > 5) return; playChordFromVisual(); }
+
+        function initWorld() {
+            for (let r = 0; r < 6; r++) {
+                const ring = document.createElement('div'); ring.className = 'ring'; ring.id = `r-${r}`;
+                notesMap.forEach((note, i) => {
+                    const p = document.createElement('div'); p.className = 'note-panel'; p.innerText = note;
+                    p.style.transform = `rotateY(${i * 30}deg) translateZ(230px)`;
+                    p.onclick = (e) => { e.stopPropagation(); handleNoteClick(note, r); };
+                    ring.appendChild(p);
+                });
+                document.getElementById('world').appendChild(ring);
+            }
+        }
+
+        function update(animate = false, shouldPlay = false) {
+            document.querySelectorAll('label').forEach(l => l.classList.remove('selected'));
+            document.getElementById(`type-${currentChord}`).classList.add('selected');
+            document.getElementById(`inv-${currentInv}`).classList.add('selected');
+            const offsets = chordLib[currentChord];
+            const ringOrder = [0, 1, 2, 3, 4, 5];
+            if (currentInv === 1) [ringOrder[0], ringOrder[1], ringOrder[2], ringOrder[3]] = [1, 2, 3, 0];
+            if (currentInv === 2) [ringOrder[0], ringOrder[1], ringOrder[2], ringOrder[3]] = [2, 3, 0, 1];
+            if (currentInv === 3) [ringOrder[0], ringOrder[1], ringOrder[2], ringOrder[3]] = [3, 0, 1, 2];
+            
+            offsets.forEach((offset, i) => {
+                const ring = document.getElementById(`r-${i}`);
+                if (offset === null) { ring.style.opacity = "0"; setTimeout(() => { if(ring.style.opacity === "0") ring.style.visibility = "hidden"; }, 400); }
+                else {
+                    ring.style.visibility = "visible"; ring.style.opacity = "1";
+                    const vPos = ringOrder.indexOf(i);
+                    ring.style.top = (vPos * 60) + "px";
+                    const target = -(globalBaseRotation + offset * 30);
+                    ringAngles[i] = animate ? getShortest(ringAngles[i], target) : target;
+                    let color = i===0 ? 'var(--color-root)' : i===1 ? 'var(--color-3rd)' : i===3 ? 'var(--color-7th)' : i>=4 ? 'var(--color-ext)' : 'var(--color-dim)';
+                    ring.querySelectorAll('.note-panel').forEach(p => { p.style.color = color; p.style.borderColor = color==='var(--color-dim)' ? '#222' : color; });
+                }
+                ring.style.transition = animate ? "transform 0.5s cubic-bezier(0.18,0.89,0.32,1.2), top 0.6s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s" : "none";
+                ring.style.transform = `rotateY(${ringAngles[i]}deg)`;
+            });
+            document.getElementById('guide').style.height = `${offsets.filter(o=>o!==null).length * 60 - 8}px`;
+            if (shouldPlay) playChordFromVisual();
+        }
+
+        function getShortest(cur, tar) { return cur + (((tar - cur + 540) % 360) - 180); }
+        window.onmousedown = (e) => { if (e.target.closest('.menu-group')) return; startX = e.clientX; isDragging = true; totalMoved = 0; document.querySelectorAll('.ring').forEach(r => r.style.transition = "none"); };
+        window.onmousemove = (e) => { if (!isDragging) return; dragOffset = (e.clientX - startX) * 0.5; totalMoved += Math.abs(e.movementX); document.querySelectorAll('.ring').forEach((ring, i) => { if(ring.style.visibility !== "hidden") ring.style.transform = `rotateY(${ringAngles[i] + dragOffset}deg)`; }); };
+        window.onmouseup = () => { if (!isDragging) return; const snapped = Math.round((ringAngles[0] + dragOffset) / 30) * 30; globalBaseRotation = -snapped; dragOffset = 0; isDragging = false; update(true, totalMoved < 5); };
+
+        initMenus(); initWorld(); update();
+    </script>
+</body>
+</html>

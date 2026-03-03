@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>3D 爵士实验室 · 逆向物理音高版</title>
+    <style>
+        :root {
+            --bg-color: #050505; --disk-height: 52px; --note-width: 110px; 
+            --color-root: #ffcc00; --color-3rd: #ffffff; --color-7th: #00ffcc; 
+            --color-ext: #ff4488; --color-dim: #333333;
+        }
+        body { background-color: var(--bg-color); color: white; margin: 0; height: 100vh; font-family: 'Segoe UI', sans-serif; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        
+        /* 布局控制 */
+        .panel-container { position: absolute; width: 100%; height: 100%; display: flex; justify-content: space-between; padding: 25px; box-sizing: border-box; pointer-events: none; z-index: 100; }
+        .menu-group { background: rgba(15,15,15,0.92); border: 1px solid #444; border-radius: 12px; padding: 15px; display: grid; gap: 8px; pointer-events: auto; backdrop-filter: blur(15px); align-self: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        
+        .left-panel { display: flex; flex-direction: column; gap: 20px; }
+        .chord-grid { grid-template-columns: repeat(2, 100px); }
+        
+        .right-panel { width: 150px; }
+        .octave-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #333; }
+        .octave-row:last-child { border: none; }
+        .octave-label { font-size: 0.7rem; color: #aaa; width: 45px; font-weight: bold; }
+        .oct-btn { width: 26px; height: 26px; background: #222; border: 1px solid #555; color: white; cursor: pointer; border-radius: 4px; transition: 0.2s; }
+        .oct-btn:hover { background: #444; border-color: var(--color-7th); }
+        .oct-val { font-size: 0.9rem; width: 20px; text-align: center; color: var(--color-7th); font-family: monospace; }
+
+        label { padding: 10px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; text-align: center; border: 1px solid #222; transition: 0.2s; color: #666; background: #111; }
+        label.selected { background: #333; border-color: var(--color-7th); color: white; box-shadow: 0 0 15px rgba(0,255,204,0.2); }
+        input { display: none; }
+
+        #viewport { width: 100vw; height: 100vh; perspective: 1200px; display: flex; align-items: center; justify-content: center; cursor: crosshair; }
+        #world { position: relative; transform-style: preserve-3d; transform: rotateX(-8deg); height: 400px; width: 0; pointer-events: none; }
+        
+        .ring { position: absolute; width: 0; height: var(--disk-height); transform-style: preserve-3d; transition: transform 0.5s cubic-bezier(0.18,0.89,0.32,1.2), top 0.6s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s; }
+        .note-panel { position: absolute; width: var(--note-width); height: var(--disk-height); left: calc(var(--note-width)/-2); background: #0a0a0a; border: 1.5px solid #222; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: bold; font-size: 1.4rem; backface-visibility: hidden; pointer-events: auto; cursor: pointer; transform: translateZ(0); }
+        .note-panel::after { content: attr(data-deg); font-size: 0.6rem; opacity: 0.4; margin-top: 2px; }
+        
+        #guide { position: absolute; width: calc(var(--note-width) + 12px); border: 2px solid var(--color-root); left: calc((var(--note-width) + 12px) / -2); top: -3px; transform: translateZ(265px); border-radius: 4px; transition: height 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); pointer-events: none; }
+        .hint { position: absolute; bottom: 20px; color: #444; font-size: 0.7rem; }
+    </style>
+</head>
+<body>
+    <div class="panel-container">
+        <div class="left-panel">
+            <div class="menu-group chord-grid" id="chordMenu"></div>
+            <div class="menu-group" id="invMenu" style="grid-template-columns: repeat(2, 100px);"></div>
+        </div>
+        <div class="menu-group right-panel" id="octaveMenu">
+            <div style="font-size: 0.6rem; color: #555; margin-bottom: 10px; text-align: center; letter-spacing: 1px;">OCTAVE (DOWN ⮕ UP)</div>
+        </div>
+    </div>
+    
+    <div id="viewport" onclick="handleViewportClick(event)">
+        <div id="world"><div id="guide"></div></div>
+        <div class="hint">点击空白播放整体 · 点击音符试听单音</div>
+    </div>
+
+    <script>
+        // --- 音频引擎 ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const noteFrequencies = { "C": 261.63, "G": 392.00, "D": 293.66, "A": 440.00, "E": 329.63, "B": 493.88, "Gb": 369.99, "Db": 277.18, "Ab": 415.30, "Eb": 311.13, "Bb": 466.16, "F": 349.23 };
+        let ringOctaves = [0, 0, 0, 0, 0, 0]; 
+
+        function playTone(freq, type = 'triangle', duration = 1.2, volume = 0.15) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(volume, audioCtx.currentTime + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + duration);
+        }
+
+        // --- 核心堆叠逻辑 (逆向版) ---
+        function playChordFromVisual() {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    
+    const offsets = chordLib[currentChord];
+    const ringOrder = [0, 1, 2, 3, 4, 5];
+    
+    // 处理转位逻辑：确定谁在视觉最上方
+    if (currentInv === 1) [ringOrder[0], ringOrder[1], ringOrder[2], ringOrder[3]] = [1, 2, 3, 0];
+    if (currentInv === 2) [ringOrder[0], ringOrder[1], ringOrder[2], ringOrder[3]] = [2, 3, 0, 1];
+    if (currentInv === 3) [ringOrder[0], ringOrder[1], ringOrder[2], ringOrder[3]] = [3, 0, 1, 2];
+
+    const activeRings = [];
+    offsets.forEach((offset, i) => {
+        if (offset !== null) {
+            activeRings.push({ ringIdx: i, vPos: ringOrder.indexOf(i), offset: offset });
+        }
+    });
+    
+    // 视觉从上到下排序 (vPos 0 是最顶端)
+    activeRings.sort((a, b) => a.vPos - b.vPos);
+
+    let lastFreq = 0;
+
+    activeRings.forEach((ring, i) => {
+        const idx = (Math.round(globalBaseRotation / 30) + ring.offset + 1200) % 12;
+        let baseFreq = noteFrequencies[notesMap[idx]];
+
+        // 【关键步骤 1】：归一化。把所有音符都缩放到同一个频率区间（C4-B4）
+        // 这样消除五度圈自带的高低差
+        while (baseFreq < 261.63) baseFreq *= 2;
+        while (baseFreq >= 523.25) baseFreq /= 2;
+
+        let finalFreq = baseFreq;
+
+        // 【关键步骤 2】：根据视觉层级强制分配八度
+        if (i === 0) {
+            // 最顶层：强制降为低音 Bass (C2-B2 区间)
+            finalFreq /= 4; 
+        } else {
+            // 随后的每一层：强制必须比上一层（上方圆盘）高
+            while (finalFreq <= lastFreq) {
+                finalFreq *= 2;
+            }
+            // 爵士排列优化：如果两音太近（小于小三度），再升一个八度增加开度
+            if (finalFreq / lastFreq < 1.15) {
+                finalFreq *= 2;
+            }
+        }
+
+        // 【关键步骤 3】：应用右侧面板的手动干预
+        finalFreq *= Math.pow(2, ringOctaves[ring.ringIdx]);
+
+        lastFreq = finalFreq;
+
+        const isBass = (i === 0);
+        playTone(finalFreq, isBass ? 'sine' : 'triangle', 1.8, isBass ? 0.25 : 0.12);
+    });
+}
+        // --- UI 与 交互 ---
+        const notesMap = ["C", "G", "D", "A", "E", "B", "Gb", "Db", "Ab", "Eb", "Bb", "F"];
+        const chordLib = { "Maj7": [0,4,1,5,null,null], "m7": [0,9,1,10,null,null], "Dom7": [0,4,1,10,null,null], "dim7": [0,9,6,3,null,null], "m9": [0,9,1,10,2,null], "7#11": [0,4,1,10,2,6], "7b13": [0,4,1,10,2,8] };
+        const inversions = ["Root", "1st", "2nd", "3rd"];
+        let globalBaseRotation = 0, ringAngles = new Array(6).fill(0), currentChord = "Maj7", currentInv = 0, isDragging = false, totalMoved = 0, startX, dragOffset = 0;
+
+        function initMenus() {
+            const cMenu = document.getElementById('chordMenu');
+            Object.keys(chordLib).forEach(type => {
+                const lbl = document.createElement('label'); lbl.id = `type-${type}`;
+                lbl.innerHTML = `<input type="radio" name="c">${type}`;
+                lbl.onclick = (e) => { e.stopPropagation(); currentChord = type; update(true, true); };
+                cMenu.appendChild(lbl);
+            });
+            const iMenu = document.getElementById('invMenu');
+            inversions.forEach((name, i) => {
+                const lbl = document.createElement('label'); lbl.id = `inv-${i}`;
+                lbl.innerHTML = `<input type="radio" name="i">${name}`;
+                lbl.onclick = (e) => { e.stopPropagation(); currentInv = i; update(true, true); };
+                iMenu.appendChild(lbl);
+            });
+            const oMenu = document.getElementById('octaveMenu');
+            ["ROOT", "3rd", "5th", "7th", "9th", "EXT"].forEach((name, i) => {
+                const row = document.createElement('div'); row.className = 'octave-row';
+                row.innerHTML = `<div class="octave-label">${name}</div><div class="octave-ctrl"><button class="oct-btn" onclick="changeOctave(${i},-1)">-</button><div class="oct-val" id="oct-v-${i}">${ringOctaves[i]}</div><button class="oct-btn" onclick="changeOctave(${i},1)">+</button></div>`;
+                oMenu.appendChild(row);
+            });
+        }
+
+        window.changeOctave = (idx, dir) => { event.stopPropagation(); ringOctaves[idx] = Math.max(-2, Math.min(2, ringOctaves[idx] + dir)); document.getElementById(`oct-v-${idx}`).innerText = ringOctaves[idx]; update(false, true); };
+
+        function handleViewportClick(e) { if (e && e.target.closest('.menu-group') || totalMoved > 5) return; playChordFromVisual(); }
+
+        function initWorld() {
+            for (let r = 0; r < 6; r++) {
+                const ring = document.createElement('div'); ring.className = 'ring'; ring.id = `r-${r}`;
+                notesMap.forEach((note, i) => {
+                    const p = document.createElement('div'); p.className = 'note-panel'; p.innerText = note;
+                    p.dataset.deg = ["1", "3", "5", "7", "9", "11/13"][r];
+                    p.style.transform = `rotateY(${i * 30}deg) translateZ(230px)`;
+                    p.onclick = (e) => {
+                        e.stopPropagation(); if (totalMoved > 5) return;
+                        // 单音试听也应遵循当前的物理堆叠高度？为了简单，单音试听默认中间音高，受面板控制
+                        const freq = noteFrequencies[note] * Math.pow(2, ringOctaves[r]);
+                        playTone(freq, 'sine', 1.0, 0.3);
+                    };
+                    ring.appendChild(p);
+                });
+                document.getElementById('world').appendChild(ring);
+            }
+        }
+
+        function update(animate = false, shouldPlay = false) {
+            document.querySelectorAll('label').forEach(l => l.classList.remove('selected'));
+            document.getElementById(`type-${currentChord}`).classList.add('selected');
+            document.getElementById(`inv-${currentInv}`).classList.add('selected');
+
+            const offsets = chordLib[currentChord];
+            const ringOrder = [0, 1, 2, 3, 4, 5];
+            if (currentInv === 1) [ringOrder[0], ringOrder[1], ringOrder[2], ringOrder[3]] = [1, 2, 3, 0];
+            if (currentInv === 2) [ringOrder[0], ringOrder[1], ringOrder[2], ringOrder[3]] = [2, 3, 0, 1];
+            if (currentInv === 3) [ringOrder[0], ringOrder[1], ringOrder[2], ringOrder[3]] = [3, 0, 1, 2];
+
+            let activeCount = 0;
+            offsets.forEach((offset, i) => {
+                const ring = document.getElementById(`r-${i}`);
+                if (offset === null) {
+                    ring.style.opacity = "0";
+                    setTimeout(() => { if(ring.style.opacity === "0") ring.style.visibility = "hidden"; }, 400);
+                } else {
+                    ring.style.visibility = "visible"; ring.style.opacity = "1"; activeCount++;
+                    ring.style.top = (ringOrder.indexOf(i) * 60) + "px";
+                    const target = -(globalBaseRotation + offset * 30);
+                    ringAngles[i] = animate ? getShortest(ringAngles[i], target) : target;
+                    
+                    let color = 'var(--color-dim)';
+                    if(i===0) color = 'var(--color-root)'; else if(i===1) color = 'var(--color-3rd)';
+                    else if(i===3) color = 'var(--color-7th)'; else if(i>=4) color = 'var(--color-ext)';
+                    ring.querySelectorAll('.note-panel').forEach(p => { p.style.color = color; p.style.borderColor = (color === 'var(--color-dim)') ? '#222' : color; });
+                }
+                ring.style.transition = animate ? "transform 0.5s cubic-bezier(0.18,0.89,0.32,1.2), top 0.6s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s" : "none";
+                ring.style.transform = `rotateY(${ringAngles[i]}deg)`;
+            });
+            document.getElementById('guide').style.height = `${activeCount * 60 - 8}px`;
+            if (shouldPlay) playChordFromVisual();
+        }
+
+        window.onmousedown = (e) => { if (e.target.closest('.menu-group')) return; startX = e.clientX; isDragging = true; totalMoved = 0; document.querySelectorAll('.ring').forEach(r => r.style.transition = "none"); };
+        window.onmousemove = (e) => { if (!isDragging) return; dragOffset = (e.clientX - startX) * 0.5; totalMoved += Math.abs(e.movementX); document.querySelectorAll('.ring').forEach((ring, i) => { if(ring.style.visibility !== "hidden") ring.style.transform = `rotateY(${ringAngles[i] + dragOffset}deg)`; }); };
+        window.onmouseup = () => { if (!isDragging) return; const snapped = Math.round((ringAngles[0] + dragOffset) / 30) * 30; globalBaseRotation = -snapped; dragOffset = 0; isDragging = false; update(true, totalMoved < 5); };
+        function getShortest(cur, tar) { return cur + (((tar - cur + 540) % 360) - 180); }
+
+        initMenus(); initWorld(); update();
+    </script>
+</body>
+</html>

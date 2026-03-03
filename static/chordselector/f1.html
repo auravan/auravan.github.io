@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>3D 爵士实验室 · 幽灵终结 Pro</title>
+    <style>
+        :root {
+            --bg-color: #050505; --disk-height: 52px; --disk-radius: 230px; --note-width: 110px; 
+            --color-root: #ffcc00; --color-3rd: #ffffff; --color-7th: #00ffcc; 
+            --color-ext: #ff4488; --color-dim: #333333;
+        }
+        body {
+            background-color: var(--bg-color); color: white; margin: 0;
+            height: 100vh; font-family: 'Segoe UI', sans-serif;
+            overflow: hidden; display: flex; flex-direction: column; align-items: center;
+        }
+        .panel-container { position: absolute; width: 100%; display: flex; justify-content: space-between; padding: 20px; box-sizing: border-box; z-index: 100; pointer-events: none; }
+        .menu-group { background: rgba(15,15,15,0.9); border: 1px solid #444; border-radius: 12px; padding: 12px; display: grid; gap: 6px; pointer-events: auto; backdrop-filter: blur(10px); }
+        .chord-grid { grid-template-columns: repeat(2, 110px); }
+        .inv-grid { grid-template-columns: 90px; }
+        label { padding: 6px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; text-align: center; border: 1px solid #222; transition: 0.2s; color: #666; }
+        label.selected { background: #333; border-color: var(--color-7th); color: white; box-shadow: 0 0 10px rgba(0,255,204,0.3); }
+        input { display: none; }
+
+        #viewport { width: 100vw; height: 100vh; perspective: 1200px; display: flex; align-items: center; justify-content: center; }
+        
+        /* 核心修复：world 和 ring 容器必须完全透明且无边框，彻底杜绝任何“平面”产生的可能 */
+        #world { 
+            position: relative; transform-style: preserve-3d; 
+            transform: rotateX(-8deg) rotateY(0deg); 
+            height: 400px; width: 0; pointer-events: none;
+            background: transparent !important; border: none !important;
+        }
+
+        .ring { 
+            position: absolute; width: 0; height: var(--disk-height); 
+            transform-style: preserve-3d; 
+            background: transparent !important; border: none !important;
+            transition: transform 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.2), 
+                        top 0.6s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        opacity 0.4s ease;
+        }
+        
+        .note-panel { 
+            position: absolute; width: var(--note-width); height: var(--disk-height);
+            left: calc(var(--note-width) / -2); background: #0a0a0a; border: 1.5px solid #222;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 1.4rem; 
+            /* 幽灵终结 Pro 1: 强制背面隐藏 */
+            backface-visibility: hidden; 
+            -webkit-backface-visibility: hidden;
+            box-sizing: border-box;
+            /* 幽灵终结 Pro 2: 强制 3D 独立层级渲染，防止合并层导致的“拍扁” */
+            transform: translateZ(0); 
+            -webkit-transform: translateZ(0);
+        }
+        .note-panel::after { content: attr(data-deg); font-size: 0.6rem; opacity: 0.4; margin-top: 2px; }
+        
+        #guide {
+            position: absolute; 
+            width: calc(var(--note-width) + 12px); 
+            border: 2px solid var(--color-root);
+            left: calc((var(--note-width) + 12px) / -2); 
+            top: -3px; 
+            /* 推得更远，防止 rotateX(-8deg) 导致的前端穿透 */
+            transform: translateZ(265px); 
+            pointer-events: none;
+            box-shadow: 0 0 20px rgba(255,204,0,0.3);
+            z-index: 9999;
+            border-radius: 4px;
+            box-sizing: border-box;
+            transition: height 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+    </style>
+</head>
+<body>
+    <div class="panel-container">
+        <div class="menu-group chord-grid" id="chordMenu"></div>
+        <div class="menu-group inv-grid" id="invMenu"></div>
+    </div>
+    <div id="viewport">
+        <div id="world"><div id="guide"></div></div>
+    </div>
+
+    <script>
+        const notesMap = ["C", "G", "D", "A", "E", "B", "Gb", "Db", "Ab", "Eb", "Bb", "F"];
+        const chordLib = {
+            "Maj7": [0, 4, 1, 5, null, null], "m7": [0, 9, 1, 10, null, null],
+            "Dom7": [0, 4, 1, 10, null, null], "dim7": [0, 9, 6, 3, null, null],
+            "Aug7": [0, 4, 8, 10, null, null], "7b9": [0, 4, 1, 10, 8, null],
+            "7#9": [0, 4, 1, 10, 3, null], "7#11": [0, 4, 1, 10, 2, 6],
+            "7b13": [0, 4, 1, 10, 2, 8], "m9": [0, 9, 1, 10, 2, null]
+        };
+        const inversions = ["Root", "1st", "2nd", "3rd"];
+
+        let globalBaseRotation = 0, ringAngles = new Array(6).fill(0); 
+        let currentChord = "Maj7", currentInv = 0, startX, dragOffset = 0, isDragging = false;
+
+        function initMenus() {
+            const cMenu = document.getElementById('chordMenu');
+            Object.keys(chordLib).forEach(type => {
+                const lbl = document.createElement('label'); lbl.id = `type-${type}`;
+                lbl.innerHTML = `<input type="radio" name="c">${type}`;
+                lbl.onclick = () => { currentChord = type; update(true); };
+                cMenu.appendChild(lbl);
+            });
+            const iMenu = document.getElementById('invMenu');
+            inversions.forEach((name, i) => {
+                const lbl = document.createElement('label'); lbl.id = `inv-${i}`;
+                lbl.innerHTML = `<input type="radio" name="i">${name}`;
+                lbl.onclick = () => { currentInv = i; update(true); };
+                iMenu.appendChild(lbl);
+            });
+        }
+
+        function initWorld() {
+            for (let r = 0; r < 6; r++) {
+                const ring = document.createElement('div');
+                ring.className = 'ring'; ring.id = `r-${r}`; ring.dataset.idx = r;
+                // 幽灵终结 Pro 3: 给每一层不同的微米级 Z 轴偏移，彻底切断层叠竞争的可能性
+                const layerZ = r * 0.05; 
+                notesMap.forEach((note, i) => {
+                    const p = document.createElement('div');
+                    p.className = 'note-panel'; p.innerText = note;
+                    p.dataset.deg = ["1", "3", "5", "7", "9", "11/13"][r];
+                    // 初始化面板：应用 translateZ 以强制独立层级渲染
+                    p.style.transform = `rotateY(${i * 30}deg) translateZ(${230 + layerZ}px)`;
+                    ring.appendChild(p);
+                });
+                document.getElementById('world').appendChild(ring);
+            }
+        }
+
+        function getShortest(cur, tar) { return cur + (((tar - cur + 540) % 360) - 180); }
+
+        function update(animate = false) {
+            document.querySelectorAll('label').forEach(l => l.classList.remove('selected'));
+            document.getElementById(`type-${currentChord}`).classList.add('selected');
+            document.getElementById(`inv-${currentInv}`).classList.add('selected');
+
+            const offsets = chordLib[currentChord];
+            const ringOrder = [0, 1, 2, 3, 4, 5]; 
+            if (currentInv === 1) [ringOrder[0], ringOrder[1], ringOrder[2], ringOrder[3]] = [1, 2, 3, 0];
+            if (currentInv === 2) [ringOrder[0], ringOrder[1], ringOrder[2], ringOrder[3]] = [2, 3, 0, 1];
+            if (currentInv === 3) [ringOrder[0], ringOrder[1], ringOrder[2], ringOrder[3]] = [3, 0, 1, 2];
+
+            let activeCount = 0;
+            offsets.forEach((offset, i) => {
+                const ring = document.getElementById(`r-${i}`);
+                if (offset === null) {
+                    ring.style.opacity = "0";
+                    ring.style.pointerEvents = "none";
+                    // 隐藏时延迟设置 visibility: hidden，确保动画完成，防止渲染残留
+                    setTimeout(() => { if(ring.style.opacity === "0") ring.style.visibility = "hidden"; }, 400);
+                } else {
+                    ring.style.visibility = "visible";
+                    ring.style.opacity = "1";
+                    ring.style.pointerEvents = "auto";
+                    activeCount++;
+                    const vPos = ringOrder.indexOf(i);
+                    ring.style.top = (vPos * 60) + "px";
+
+                    const target = -(globalBaseRotation + offset * 30);
+                    ringAngles[i] = animate ? getShortest(ringAngles[i], target) : target;
+                    
+                    let color = 'var(--color-dim)';
+                    if(i===0) color = 'var(--color-root)'; else if(i===1) color = 'var(--color-3rd)';
+                    else if(i===3) color = 'var(--color-7th)'; else if(i>=4) color = 'var(--color-ext)';
+                    
+                    ring.querySelectorAll('.note-panel').forEach(p => {
+                        p.style.color = color;
+                        p.style.borderColor = (color === 'var(--color-dim)') ? '#222' : color;
+                        p.style.boxShadow = (color === 'var(--color-dim)') ? 'none' : `0 0 10px ${color}44`;
+                    });
+                }
+                ring.style.transition = animate ? "transform 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.2), top 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s" : "none";
+                ring.style.transform = `rotateY(${ringAngles[i]}deg)`;
+            });
+
+            document.getElementById('guide').style.height = `${activeCount * 60 - 8}px`;
+        }
+
+        window.onmousedown = (e) => {
+            if (e.target.closest('.menu-group')) return;
+            e.preventDefault(); startX = e.clientX; isDragging = true;
+            document.querySelectorAll('.ring').forEach(r => r.style.transition = "none");
+        };
+
+        window.onmousemove = (e) => {
+            if (!isDragging) return;
+            const dx = (e.clientX - startX) * 0.5;
+            dragOffset = dx;
+            document.querySelectorAll('.ring').forEach((ring, i) => {
+                if(ring.style.visibility !== "hidden") {
+                    ring.style.transform = `rotateY(${ringAngles[i] + dragOffset}deg)`;
+                }
+            });
+        };
+
+        window.onmouseup = () => {
+            if (!isDragging) return;
+            const finalRootPos = ringAngles[0] + dragOffset;
+            const snappedRoot = Math.round(finalRootPos / 30) * 30;
+            globalBaseRotation = -snappedRoot; 
+            dragOffset = 0; isDragging = false;
+            update(true); 
+        };
+
+        initMenus(); initWorld(); update();
+    </script>
+</body>
+</html>

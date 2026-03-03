@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>3D 爵士和弦实验室 · 强力转位版</title>
+    <style>
+        :root {
+            --bg-color: #050505;
+            --disk-height: 52px;
+            --disk-radius: 230px;
+            --note-width: 110px; 
+            --color-root: #ffcc00;   /* 根音：金 */
+            --color-3rd: #ffffff;    /* 三音：白 */
+            --color-7th: #00ffcc;    /* 七音：青 */
+            --color-ext: #ff4488;    /* 扩展音：红粉 */
+            --color-dim: #333333;    /* 默认/减弱音 */
+        }
+
+        body {
+            background-color: var(--bg-color); color: white; margin: 0;
+            height: 100vh; font-family: 'Segoe UI', sans-serif;
+            overflow: hidden; display: flex; flex-direction: column; align-items: center;
+        }
+
+        .panel-container {
+            position: absolute; width: 100%; display: flex; justify-content: space-between;
+            padding: 20px; box-sizing: border-box; z-index: 100; pointer-events: none;
+        }
+        .menu-group {
+            background: rgba(15,15,15,0.9); border: 1px solid #444;
+            border-radius: 12px; padding: 12px; display: grid; gap: 6px;
+            pointer-events: auto; backdrop-filter: blur(10px);
+        }
+        .chord-grid { grid-template-columns: repeat(2, 110px); }
+        .inv-grid { grid-template-columns: 80px; }
+
+        label {
+            padding: 6px; border-radius: 6px; cursor: pointer;
+            font-size: 0.75rem; text-align: center; border: 1px solid #222; 
+            transition: all 0.2s; color: #666;
+        }
+        label.selected { background: #333; border-color: var(--color-7th); color: white; box-shadow: 0 0 10px rgba(0,255,204,0.3); }
+        input { display: none; }
+
+        #viewport { width: 100vw; height: 100vh; perspective: 1500px; display: flex; align-items: center; justify-content: center; }
+        #world { position: relative; transform-style: preserve-3d; transform: rotateX(-12deg) rotateY(0deg); }
+
+        .ring { position: relative; width: 0; height: var(--disk-height); transform-style: preserve-3d; margin: 4px 0; cursor: grab; }
+        
+        .note-panel {
+            position: absolute; width: var(--note-width); height: var(--disk-height);
+            left: calc(var(--note-width) / -2); background: #0a0a0a; border: 1.5px solid #222;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 1.4rem; backface-visibility: hidden;
+        }
+        .note-panel::after { content: attr(data-deg); font-size: 0.6rem; opacity: 0.4; margin-top: 2px; }
+    </style>
+</head>
+<body>
+
+    <div class="panel-container">
+        <div class="menu-group chord-grid" id="chordMenu"></div>
+        <div class="menu-group inv-grid" id="invMenu">
+            <div style="font-size: 0.6rem; color: #555; text-align: center; margin-bottom: 2px;">INVERSION</div>
+        </div>
+    </div>
+
+    <div id="viewport">
+        <div id="world"></div>
+    </div>
+
+    <script>
+        const notes = ["C", "G", "D", "A", "E", "B", "Gb", "Db", "Ab", "Eb", "Bb", "F"];
+        
+        // 索引基于五度圈顺序
+        const chordLib = {
+            "Maj7":   [0, 4, 1, 5,  null, null],
+            "m7":     [0, 9, 1, 10, null, null],
+            "Dom7":   [0, 4, 1, 10, null, null],
+            "dim7":   [0, 9, 6, 3,  null, null], // 减七
+            "Aug7":   [0, 4, 8, 10, null, null], // 增七 (#5)
+            "7b9":    [0, 4, 1, 10, 8,    null],
+            "7#9":    [0, 4, 1, 10, 3,    null],
+            "7#11":   [0, 4, 1, 10, 2,    6],
+            "7b13":   [0, 4, 1, 10, 2,    8],
+            "m9":     [0, 9, 1, 10, 2,    null]
+        };
+        const inversions = ["Root", "1st", "2nd", "3rd"];
+
+        const world = document.getElementById('world');
+        let ringAngles = new Array(6).fill(0);
+        let currentChord = "Maj7";
+        let currentInv = 0;
+        let startX, startY, viewX = -12, viewY = 0, activeIdx = null, dragOffset = 0;
+
+        function initMenus() {
+            const cMenu = document.getElementById('chordMenu');
+            Object.keys(chordLib).forEach(type => {
+                const lbl = document.createElement('label');
+                lbl.id = `type-${type}`;
+                lbl.innerHTML = `<input type="radio" name="c">${type}`;
+                lbl.onclick = () => { currentChord = type; update(true); };
+                cMenu.appendChild(lbl);
+            });
+            const iMenu = document.getElementById('invMenu');
+            inversions.forEach((name, i) => {
+                const lbl = document.createElement('label');
+                lbl.id = `inv-${i}`;
+                lbl.innerHTML = `<input type="radio" name="i">${name}`;
+                lbl.onclick = () => { currentInv = i; update(true); };
+                iMenu.appendChild(lbl);
+            });
+        }
+
+        function initWorld() {
+            for (let r = 0; r < 6; r++) {
+                const ring = document.createElement('div');
+                ring.className = 'ring'; ring.id = `r-${r}`; ring.dataset.idx = r;
+                notes.forEach((note, i) => {
+                    const p = document.createElement('div');
+                    p.className = 'note-panel'; p.innerText = note;
+                    p.dataset.deg = ["1", "3", "5", "7", "9", "11/13"][r];
+                    p.style.transform = `rotateY(${-i * 30}deg) translateZ(230px)`;
+                    ring.appendChild(p);
+                });
+                world.appendChild(ring);
+            }
+        }
+
+        function getShortest(cur, tar) { return cur + (((tar - cur + 540) % 360) - 180); }
+
+        function update(animate = false) {
+            document.querySelectorAll('label').forEach(l => l.classList.remove('selected'));
+            document.getElementById(`type-${currentChord}`).classList.add('selected');
+            document.getElementById(`inv-${currentInv}`).classList.add('selected');
+
+            const offsets = chordLib[currentChord];
+            
+            // --- 核心转位修复逻辑 ---
+            // 找到当前转位音程相对于根音的偏移（例如 1st inversion 对应三音偏移）
+            const invStepOffset = (offsets[currentInv] !== null) ? offsets[currentInv] : 0;
+            
+            // 目标：让“转位音”对应 0 度。 
+            // 算法：所有圆盘的目标角度 = (音程偏移 - 转位音偏移) * 30度 + 当前根音基准
+            const baseRoot = ringAngles[0] - (offsets[0] - invStepOffset) * 30;
+
+            offsets.forEach((offset, i) => {
+                const el = document.getElementById(`r-${i}`);
+                if (offset === null) {
+                    el.style.opacity = "0.05";
+                } else {
+                    el.style.opacity = "1";
+                    const target = baseRoot + (offset - invStepOffset) * 30;
+                    ringAngles[i] = animate ? getShortest(ringAngles[i], target) : target;
+                    
+                    // 颜色逻辑
+                    let color = 'var(--color-dim)';
+                    if(i===0) color = 'var(--color-root)';
+                    else if(i===1) color = 'var(--color-3rd)';
+                    else if(i===3) color = 'var(--color-7th)';
+                    else if(i>=4) color = 'var(--color-ext)';
+                    // 特殊处理增减五度
+                    if(i===2 && (currentChord==="dim7" || currentChord==="Aug7")) color = 'var(--color-ext)';
+
+                    el.querySelectorAll('.note-panel').forEach(p => {
+                        p.style.color = color;
+                        p.style.borderColor = (color === 'var(--color-dim)') ? '#222' : color;
+                        p.style.textShadow = (color === 'var(--color-dim)') ? 'none' : `0 0 10px ${color}`;
+                    });
+                }
+                el.style.transition = animate ? "transform 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.1)" : "none";
+                el.style.transform = `rotateY(${ringAngles[i]}deg)`;
+            });
+        }
+
+        window.onmousedown = (e) => {
+            startX = e.clientX; startY = e.clientY; dragOffset = 0;
+            const hit = e.target.closest('.ring');
+            activeIdx = hit ? parseInt(hit.dataset.idx) : -1;
+            if(activeIdx >= 0) {
+                for(let i=0; i<6; i++) document.getElementById(`r-${i}`).style.transition = "none";
+            }
+        };
+
+        window.onmousemove = (e) => {
+            if (startX === undefined) return;
+            const dx = (e.clientX - startX) * 0.45;
+            const dy = (e.clientY - startY) * 0.45;
+
+            if (activeIdx >= 0) {
+                dragOffset += dx;
+                for(let i=0; i<6; i++) {
+                    document.getElementById(`r-${i}`).style.transform = `rotateY(${ringAngles[i] + dragOffset}deg)`;
+                }
+            } else {
+                viewY += dx; viewX = Math.max(-40, Math.min(40, viewX - dy));
+                world.style.transform = `rotateX(${viewX}deg) rotateY(${viewY}deg)`;
+            }
+            startX = e.clientX; startY = e.clientY;
+        };
+
+        window.onmouseup = () => {
+            if (activeIdx >= 0) {
+                // 吸附逻辑：无论转到哪，松开手时，被拖拽的那层音符必须正对屏幕
+                const currentPos = ringAngles[activeIdx] + dragOffset;
+                const snapped = Math.round(currentPos / 30) * 30;
+                const shift = snapped - (ringAngles[activeIdx] + dragOffset);
+                
+                for(let i=0; i<6; i++) ringAngles[i] += (dragOffset + shift);
+                dragOffset = 0;
+                update(true);
+            }
+            startX = undefined;
+        };
+
+        initMenus(); initWorld(); update();
+    </script>
+</body>
+</html>

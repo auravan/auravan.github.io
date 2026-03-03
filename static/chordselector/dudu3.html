@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>3D 大三和弦·完美联动</title>
+    <style>
+        :root {
+            --bg-color: #050505;
+            --disk-height: 60px;
+            --disk-radius: 180px;
+            --note-width: 96px; 
+            --accent-root: #ffcc00;    /* 根音盘金色 */
+            --accent-third: #ff66aa;    /* 三音盘玫瑰 */
+            --accent-fifth: #66ccff;    /* 五音盘天蓝 */
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: white;
+            margin: 0;
+            height: 100vh;
+            font-family: 'Segoe UI', sans-serif;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            position: absolute;
+            top: 20px;
+            z-index: 100;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        h2 { margin: 0; letter-spacing: 5px; color: var(--accent-root); }
+        .hint { font-size: 0.8rem; opacity: 0.7; color: #ccc; }
+
+        #viewport {
+            width: 100vw;
+            height: 100vh;
+            perspective: 1200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
+        }
+
+        #world {
+            position: relative;
+            transform-style: preserve-3d;
+            transform: rotateX(-15deg) rotateY(0deg);
+        }
+
+        .ring {
+            position: relative;
+            width: 0; height: var(--disk-height);
+            transform-style: preserve-3d;
+            margin: 4px 0;
+            cursor: grab;
+        }
+
+        .ring[data-role="root"] .note-panel {
+            border: 2px solid var(--accent-root);
+            color: var(--accent-root);
+            background: linear-gradient(135deg, #332200 0%, #111 100%);
+            box-shadow: 0 0 15px rgba(255,204,0,0.3);
+        }
+        .ring[data-role="third"] .note-panel {
+            border: 2px solid var(--accent-third);
+            color: var(--accent-third);
+            background: linear-gradient(135deg, #331122 0%, #111 100%);
+            box-shadow: 0 0 15px rgba(255,102,170,0.3);
+        }
+        .ring[data-role="fifth"] .note-panel {
+            border: 2px solid var(--accent-fifth);
+            color: var(--accent-fifth);
+            background: linear-gradient(135deg, #112233 0%, #111 100%);
+            box-shadow: 0 0 15px rgba(102,204,255,0.3);
+        }
+
+        .note-panel {
+            position: absolute;
+            width: var(--note-width);
+            height: var(--disk-height);
+            left: calc(var(--note-width) / -2);
+            background: linear-gradient(135deg, #222 0%, #111 100%);
+            border: 1px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.5rem;
+            backface-visibility: hidden;
+            box-sizing: border-box;
+            color: #888;
+            text-shadow: 0 0 8px currentColor;
+            transition: box-shadow 0.2s;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h2>TRIAD • 大三和弦</h2>
+        <p class="hint">拖动任意圆盘 — 另外两个实时跟随 (根音·三音·五音)</p>
+    </div>
+
+    <div id="viewport">
+        <div id="world"></div>
+    </div>
+
+    <script>
+        (function() {
+            const notes = ["C", "G", "D", "A", "E", "B", "Gb", "Db", "Ab", "Eb", "Bb", "F"];
+            const ringCount = 3;
+            const world = document.getElementById('world');
+            
+            let viewRotX = -15;
+            let viewRotY = 0;
+            let activeRingIndex = null; 
+            let startX, startY;
+            let ringAngles = [0, 120, 30]; // 默认C大和弦: C(0°), E(120°), G(30°)
+
+            // 工具：将角度标准化到0~360
+            function normalizeAngle(angle) {
+                return ((angle % 360) + 360) % 360;
+            }
+
+            // 根据根音索引设置三个环的角度 (0:根音, 1:三音, 2:五音)
+            function setTriadFromRoot(rootIdx) {
+                return [
+                    rootIdx * 30,
+                    ((rootIdx + 4) % 12) * 30,
+                    ((rootIdx + 1) % 12) * 30
+                ];
+            }
+
+            // 从角度获取最近音符索引 (0-11)
+            function getNoteIndex(angle) {
+                return Math.round(normalizeAngle(angle) / 30) % 12;
+            }
+
+            // 更新所有环的transform (可指定是否使用过渡)
+            function updateRings(useTransition = false) {
+                for (let i = 0; i < ringCount; i++) {
+                    const el = document.getElementById('ring-' + i);
+                    if (!el) continue;
+                    if (useTransition) {
+                        el.style.transition = "transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.2)";
+                    } else {
+                        el.style.transition = "none";
+                    }
+                    el.style.transform = `rotateY(${ringAngles[i]}deg)`;
+                }
+            }
+
+            // 初始化环
+            function init() {
+                for (let r = 0; r < ringCount; r++) {
+                    const ring = document.createElement('div');
+                    ring.className = 'ring';
+                    ring.id = 'ring-' + r;
+                    
+                    if (r === 0) ring.setAttribute('data-role', 'root');
+                    else if (r === 1) ring.setAttribute('data-role', 'third');
+                    else ring.setAttribute('data-role', 'fifth');
+
+                    notes.forEach((note, i) => {
+                        const panel = document.createElement('div');
+                        panel.className = 'note-panel';
+                        panel.innerText = note;
+                        const angle = i * 30;
+                        panel.style.transform = `rotateY(${-angle}deg) translateZ(180px)`;
+                        ring.appendChild(panel);
+                    });
+                    world.appendChild(ring);
+                }
+                // 设置默认C大和弦
+                ringAngles = [0, 120, 30];
+                updateRings(false);
+            }
+
+            // 鼠标按下
+            window.onmousedown = (e) => {
+                startX = e.clientX;
+                startY = e.clientY;
+                const hit = e.target.closest('.ring');
+                if (hit) {
+                    activeRingIndex = parseInt(hit.id.split('-')[1]);
+                    // 拖动时临时关闭所有环的过渡
+                    for (let i = 0; i < ringCount; i++) {
+                        document.getElementById('ring-' + i).style.transition = "none";
+                    }
+                } else {
+                    activeRingIndex = -1; // 旋转视角
+                }
+            };
+
+            // 鼠标移动
+            window.onmousemove = (e) => {
+                if (startX === undefined) return;
+                const deltaX = e.clientX - startX;
+                const deltaY = e.clientY - startY;
+
+                if (activeRingIndex >= 0 && activeRingIndex < ringCount) {
+                    // 拖动圆环
+                    const moveAngle = deltaX * 0.5;
+                    
+                    // 只更新被拖动环的角度
+                    ringAngles[activeRingIndex] += moveAngle;
+                    
+                    // 获取当前拖动环指向的音符索引
+                    const currentNoteIdx = getNoteIndex(ringAngles[activeRingIndex]);
+                    
+                    // 根据拖动环的角色计算新的根音
+                    let newRootIdx;
+                    if (activeRingIndex === 0) { // 拖根音
+                        newRootIdx = currentNoteIdx;
+                    } else if (activeRingIndex === 1) { // 拖三音
+                        // 三音 = 根音+4 → 根音 = 三音 -4
+                        newRootIdx = (currentNoteIdx - 4 + 12) % 12;
+                    } else { // 拖五音
+                        // 五音 = 根音+1 → 根音 = 五音 -1
+                        newRootIdx = (currentNoteIdx - 1 + 12) % 12;
+                    }
+                    
+                    // 根据新根音计算三个环的目标角度
+                    const targetAngles = setTriadFromRoot(newRootIdx);
+                    
+                    // 关键修正：被拖动的环保持连续角度，其他两个环设置为精确的量化目标
+                    // 这样拖动环时其他环会立刻跳到正确位置
+                    for (let i = 0; i < ringCount; i++) {
+                        if (i === activeRingIndex) {
+                            // 被拖动环使用当前连续角度
+                            document.getElementById('ring-' + i).style.transform = `rotateY(${ringAngles[i]}deg)`;
+                        } else {
+                            // 非拖动环直接设置到目标角度，并更新ringAngles
+                            ringAngles[i] = targetAngles[i];
+                            document.getElementById('ring-' + i).style.transform = `rotateY(${targetAngles[i]}deg)`;
+                        }
+                    }
+                } 
+                else if (activeRingIndex === -1) {
+                    // 旋转视角
+                    viewRotY += deltaX * 0.5;
+                    viewRotX = Math.max(-40, Math.min(40, viewRotX - deltaY * 0.5));
+                    world.style.transform = `rotateX(${viewRotX}deg) rotateY(${viewRotY}deg)`;
+                }
+
+                startX = e.clientX;
+                startY = e.clientY;
+            };
+
+            // 鼠标松开
+            window.onmouseup = () => {
+                if (activeRingIndex >= 0 && activeRingIndex < ringCount) {
+                    // 基于当前被拖动环的角度，计算最终根音
+                    const finalNoteIdx = getNoteIndex(ringAngles[activeRingIndex]);
+                    
+                    let finalRootIdx;
+                    if (activeRingIndex === 0) {
+                        finalRootIdx = finalNoteIdx;
+                    } else if (activeRingIndex === 1) {
+                        finalRootIdx = (finalNoteIdx - 4 + 12) % 12;
+                    } else {
+                        finalRootIdx = (finalNoteIdx - 1 + 12) % 12;
+                    }
+                    
+                    // 计算最终量化后的精确大三和弦角度
+                    const finalAngles = setTriadFromRoot(finalRootIdx);
+                    
+                    // 更新所有环的角度记录
+                    ringAngles = [...finalAngles];
+                    
+                    // 应用平滑过渡
+                    for (let i = 0; i < ringCount; i++) {
+                        const el = document.getElementById('ring-' + i);
+                        el.style.transition = "transform 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.2)";
+                        el.style.transform = `rotateY(${finalAngles[i]}deg)`;
+                    }
+                }
+
+                startX = undefined;
+                activeRingIndex = null;
+            };
+
+            init();
+        })();
+    </script>
+</body>
+</html>

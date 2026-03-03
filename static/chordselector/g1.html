@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>3D 爵士实验室 · 60.0 乐理透视版</title>
+    <style>
+        :root {
+            --bg-color: #050505; --disk-height: 48px; --note-width: 110px; 
+            --color-root: #ffcc00; --color-3rd: #ffffff; --color-7th: #00ffcc; 
+            --color-ext: #ff4488; --glow-root: 0 0 20px rgba(255, 204, 0, 0.4);
+        }
+        body { background-color: var(--bg-color); color: white; margin: 0; height: 100vh; font-family: 'Segoe UI', sans-serif; overflow: hidden; display: flex; align-items: center; justify-content: center; user-select: none; }
+        .panel-container { position: absolute; width: 100%; height: 100%; display: flex; justify-content: space-between; padding: 20px; box-sizing: border-box; pointer-events: none; z-index: 1000; }
+        .menu-group { background: rgba(15, 15, 15, 0.92); border: 1px solid #333; border-radius: 12px; padding: 12px; display: grid; gap: 6px; pointer-events: auto; backdrop-filter: blur(15px); align-self: center; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+        .chord-grid { display: grid; grid-template-columns: repeat(2, 90px); gap: 4px; }
+        .mode-selector { display: flex; background: #000; border-radius: 6px; padding: 3px; margin-bottom: 5px; border: 1px solid #444; }
+        .mode-btn { flex: 1; padding: 8px; border: none; background: none; color: #444; font-size: 0.65rem; cursor: pointer; border-radius: 4px; font-weight: bold; transition: 0.3s; }
+        .mode-btn.active { background: #222; color: var(--color-7th); }
+        .modifier-box { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 5px; }
+        .mod-btn { padding: 8px; font-size: 0.6rem; background: #111; border: 1px solid #333; color: #444; cursor: pointer; border-radius: 4px; transition: 0.2s; }
+        .mod-btn.active { border-color: var(--color-ext); color: #fff; background: #331122; }
+        .mod-btn.disabled { opacity: 0.1; cursor: not-allowed; }
+        label { padding: 9px; border-radius: 6px; cursor: pointer; font-size: 0.65rem; text-align: center; border: 1px solid #222; background: #111; color: #555; transition: 0.2s; }
+        label.selected { border-color: var(--color-root); color: #fff; background: #222; }
+        #viewport { width: 100vw; height: 100vh; perspective: 2000px; display: flex; align-items: center; justify-content: center; }
+        #world { position: relative; transform-style: preserve-3d; transform: rotateX(-8deg); height: 500px; }
+        .ring { position: absolute; width: 0; height: var(--disk-height); transform-style: preserve-3d; transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), top 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s; }
+        .note-panel { position: absolute; width: var(--note-width); height: var(--disk-height); left: calc(var(--note-width)/-2); background: rgba(8,8,8,0.95); border: 1px solid #222; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; backface-visibility: hidden; border-radius: 3px; cursor: pointer; }
+        .note-panel.hit { background: #fff !important; color: #000 !important; transition: 0s; }
+        #guide { position: absolute; width: calc(var(--note-width) + 24px); border: 2px solid var(--color-root); left: -68px; top: -5px; transform: translateZ(265px); border-radius: 6px; pointer-events: none; box-shadow: var(--glow-root); opacity: 0.3; transition: 0.6s; }
+        .section-label { font-size: 0.5rem; color: #888; text-align: center; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 1px; }
+    </style>
+</head>
+<body>
+    <div class="panel-container">
+        <div class="left-panel">
+            <div class="menu-group">
+                <div class="section-label">Play Mode</div>
+                <div class="mode-selector">
+                    <button class="mode-btn active" id="mS" onclick="setMode('Single')">SINGLE</button>
+                    <button class="mode-btn" id="mC" onclick="setMode('Chord')">CHORD</button>
+                </div>
+                <div class="section-label">Chords</div>
+                <div class="chord-grid" id="chordMenu"></div>
+            </div>
+            <div class="menu-group" id="tensionGroup">
+                <div class="section-label">Tensions</div>
+                <div class="modifier-box">
+                    <button class="mod-btn" id="t-b9" onclick="toggleTension('b9')">b9</button>
+                    <button class="mod-btn" id="t-s9" onclick="toggleTension('s9')">#9</button>
+                    <button class="mod-btn" id="t-s11" onclick="toggleTension('s11')">#11</button>
+                    <button class="mod-btn" id="t-b13" onclick="toggleTension('b13')">b13</button>
+                </div>
+            </div>
+            <div class="menu-group">
+                <div class="section-label">Inversions (Bass Note)</div>
+                <div class="chord-grid" id="invMenu"></div>
+            </div>
+        </div>
+    </div>
+    <div id="viewport"><div id="world"><div id="guide"></div></div></div>
+
+<script>
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const chromatic = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
+    const fifths = ["C", "G", "D", "A", "E", "B", "Gb", "Db", "Ab", "Eb", "Bb", "F"];
+    
+    const baseChords = { 
+        "Maj7": [0, 4, 1, 5, null, null, null, null],
+        "m7":   [0, 9, 1, 10, null, null, null, null],
+        "Dom7": [0, 4, 1, 10, null, null, null, null],
+        "Aug7": [0, 4, -4, 10, null, null, null, null], // R, 3, #5, b7
+        "6/9":  [0, 4, 1, 2, 3, null, null, null],
+        "m9":   [0, 9, 1, 10, 2, null, null, null],
+        "7alt": [0, 4, null, 10, null, 9, null, 8],
+        "dim7": [0, 9, 6, 3, null, null, null, null]
+    };
+
+    const invLabels = ["Root (R)", "1st (3rd)", "2nd (5th)", "3rd (7th)", "4th (9th)", "5th", "6th", "7th"];
+    const tensionMap = { 'b9': 7, 's9': 9, 's11': 6, 'b13': 8, 'layer': {'b9':4, 's9':5, 's11':6, 'b13':7} };
+    let state = { chord: "Dom7", inv: 0, rot: 0, mode: "Single", tensions: new Set() };
+    let isDragging = false, startDragX = 0;
+
+    function trigger(f, isRoot, duration, vol, delay=0) {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const now = audioCtx.currentTime + delay;
+        const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+        o.type = 'sine'; o.frequency.setValueAtTime(f, now);
+        g.gain.setValueAtTime(0, now);
+        g.gain.linearRampToValueAtTime(vol, now + 0.04);
+        g.gain.exponentialRampToValueAtTime(0.001, now + duration);
+        o.connect(g); g.connect(audioCtx.destination);
+        o.start(now); o.stop(now + duration + 0.1);
+    }
+
+    function isExtensionAllowed() { return ["Dom7", "7alt", "Aug7"].includes(state.chord); }
+
+    function getModifiedOffsets() {
+        let offs = [...baseChords[state.chord]];
+        if (!isExtensionAllowed()) return offs;
+        if (state.tensions.has('b9')) offs[4] = tensionMap['b9'];
+        if (state.tensions.has('s9')) offs[5] = tensionMap['s9'];
+        if (state.tensions.has('s11')) offs[6] = tensionMap['s11'];
+        if (state.tensions.has('b13')) offs[7] = tensionMap['b13'];
+        return offs;
+    }
+
+    function getFreqsMap() {
+        const offs = getModifiedOffsets();
+        const { reorderedIds } = getActiveRingsInfo();
+        let freqs = {}; let lastM = 0;
+        reorderedIds.forEach((rid, i) => {
+            const name = fifths[(Math.round(state.rot/30) + (offs[rid]||0) + 1200) % 12];
+            const sIdx = chromatic.indexOf(name);
+            let m = (i === 0) ? 48 + sIdx : lastM + 1;
+            while (m % 12 !== sIdx) m++;
+            lastM = m;
+            freqs[rid] = 440 * Math.pow(2, (m - 69) / 12);
+        });
+        return freqs;
+    }
+
+    function playFullSequence() {
+        const freqs = getFreqsMap();
+        const sorted = Object.keys(freqs).sort((a,b) => freqs[a] - freqs[b]);
+        const gap = 0.12; 
+        sorted.forEach((rid, i) => trigger(freqs[rid], rid==0, 1.2, 0.18, i * gap));
+        const chordStartTime = sorted.length * gap + 0.1;
+        Object.keys(freqs).forEach(rid => trigger(freqs[rid], rid==0, 2.0, 0.1, chordStartTime));
+    }
+
+    function setMode(m) { 
+        state.mode = m; 
+        document.getElementById('mS').className = m==='Single'?'mode-btn active':'mode-btn';
+        document.getElementById('mC').className = m==='Chord'?'mode-btn active':'mode-btn';
+        playFullSequence(); 
+    }
+
+    function toggleTension(t) {
+        if (!isExtensionAllowed()) return;
+        state.tensions.has(t) ? state.tensions.delete(t) : state.tensions.add(t);
+        update(); 
+        const freqs = getFreqsMap();
+        if(freqs[tensionMap.layer[t]]) trigger(freqs[tensionMap.layer[t]], false, 2, 0.25);
+    }
+
+    function play(id = null, el = null) {
+        const freqs = getFreqsMap();
+        if (state.mode === "Chord") {
+            Object.keys(freqs).forEach(rid => trigger(freqs[rid], rid==0, 1.8, 0.1));
+            if (id !== null && freqs[id]) trigger(freqs[id], id==0, 2.2, 0.25);
+        } else {
+            if (id !== null && freqs[id]) trigger(freqs[id], id==0, 2.0, 0.28);
+        }
+        if(el) { el.classList.add('hit'); setTimeout(()=>el.classList.remove('hit'), 120); }
+    }
+
+    window.addEventListener('keydown', e => {
+        if(e.code === 'Space') { e.preventDefault(); playFullSequence(); }
+    });
+
+    function getActiveRingsInfo() {
+        const offs = getModifiedOffsets();
+        let activeIds = offs.map((off, i) => off !== null ? i : null).filter(x => x !== null);
+        const invShift = state.inv % activeIds.length;
+        const reorderedIds = [...activeIds.slice(invShift), ...activeIds.slice(0, invShift)];
+        let idToVPos = {};
+        reorderedIds.forEach((id, index) => { idToVPos[id] = index; });
+        return { activeIds, reorderedIds, idToVPos };
+    }
+
+    function update() {
+        const { idToVPos, activeIds } = getActiveRingsInfo();
+        const offs = getModifiedOffsets();
+        const extAllowed = isExtensionAllowed();
+        
+        document.querySelectorAll('#chordMenu label').forEach(l => l.className = '');
+        if(document.getElementById('c-'+state.chord)) document.getElementById('c-'+state.chord).classList.add('selected');
+        
+        document.querySelectorAll('#invMenu label').forEach((l, idx) => {
+            l.className = (idx === state.inv) ? 'selected' : '';
+            l.style.opacity = idx < activeIds.length ? 1 : 0.1;
+            l.style.pointerEvents = idx < activeIds.length ? 'auto' : 'none';
+        });
+
+        document.querySelectorAll('.mod-btn').forEach(b => {
+            if (b.id) {
+                const t = b.id.split('-')[1];
+                b.className = extAllowed ? (state.tensions.has(t) ? 'mod-btn active' : 'mod-btn') : 'mod-btn disabled';
+            }
+        });
+
+        for(let r=0; r<8; r++) {
+            const rg = document.getElementById('r-'+r);
+            if (!rg) continue;
+            if (offs[r] === null) { rg.style.opacity = 0; rg.style.pointerEvents = 'none'; }
+            else {
+                rg.style.opacity = 1; rg.style.pointerEvents = 'auto';
+                rg.style.top = (idToVPos[r] * 55) + 'px';
+                rg.style.transform = `rotateY(${-(state.rot + (offs[r]||0)*30)}deg)`;
+                let c = r===0?'var(--color-root)':r===1?'var(--color-3rd)':r===3?'var(--color-7th)': (r>=4?'var(--color-ext)':'#aaa');
+                rg.querySelectorAll('.note-panel').forEach(p => p.style.color = c);
+            }
+        }
+        document.getElementById('guide').style.height = (activeIds.length * 55 - 8) + 'px';
+    }
+
+    function init() {
+        const cM = document.getElementById('chordMenu');
+        Object.keys(baseChords).forEach(k => {
+            const l = document.createElement('label'); l.innerText = k; l.id = 'c-'+k;
+            l.onclick = () => { state.chord = k; if(!isExtensionAllowed()) state.tensions.clear(); state.inv=0; update(); playFullSequence(); };
+            cM.appendChild(l);
+        });
+        const iM = document.getElementById('invMenu');
+        invLabels.forEach((n, i) => {
+            const l = document.createElement('label'); l.innerText = n; l.id = 'i-'+i;
+            l.onclick = () => { state.inv = i; update(); playFullSequence(); };
+            iM.appendChild(l);
+        });
+        const w = document.getElementById('world');
+        for (let r=0; r<8; r++) {
+            const rg = document.createElement('div'); rg.className = 'ring'; rg.id = 'r-'+r;
+            fifths.forEach((n, i) => {
+                const p = document.createElement('div'); p.className = 'note-panel'; p.innerText = n;
+                p.style.transform = `rotateY(${i*30}deg) translateZ(250px)`;
+                rg.appendChild(p);
+            });
+            w.appendChild(rg);
+        }
+        window.addEventListener('mousedown', e => { if(e.target.closest('.menu-group')) return; isDragging = true; startDragX = e.clientX; });
+        window.addEventListener('mousemove', e => {
+            if(!isDragging) return;
+            let diff = e.clientX - startDragX;
+            const offs = getModifiedOffsets();
+            for(let r=0; r<8; r++) {
+                const rg = document.getElementById('r-'+r);
+                if(rg && offs[r] !== null) { rg.style.transition = 'none'; rg.style.transform = `rotateY(${-(state.rot + offs[r]*30) + diff*0.4}deg)`; }
+            }
+        });
+        window.addEventListener('mouseup', e => {
+            if (!isDragging) return;
+            let diff = e.clientX - startDragX;
+            if (Math.abs(diff) < 5) {
+                const panel = e.target.closest('.note-panel');
+                if (panel) play(panel.parentElement.id.split('-')[1], panel);
+            } else {
+                state.rot -= Math.round(diff*0.4/30)*30;
+            }
+            isDragging = false; document.querySelectorAll('.ring').forEach(r => r.style.transition = ''); update();
+        });
+        update();
+    }
+    init();
+</script>
+</body>
+</html>

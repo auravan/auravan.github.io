@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>3D 音乐密码筒 Pro</title>
+    <style>
+        :root {
+            --bg-color: #0a0a0a;
+            --disk-height: 60px;
+            --disk-radius: 180px;
+            --note-width: 94px; /* (2 * PI * radius) / 12 */
+            --accent-color: #00ffcc;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: white;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+
+        /* 顶部标题 */
+        .header {
+            position: absolute;
+            top: 20px;
+            text-align: center;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        h2 { margin: 0; color: var(--accent-color); letter-spacing: 4px; }
+        .hint { font-size: 0.8rem; opacity: 0.5; }
+
+        /* 3D 舞台 */
+        #viewport {
+            width: 100vw;
+            height: 100vh;
+            perspective: 1200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
+        }
+
+        /* 整体旋转容器 */
+        #world {
+            position: relative;
+            transform-style: preserve-3d;
+            transform: rotateX(-10deg) rotateY(0deg);
+        }
+
+        /* 绿色指示框 - 现在独立于旋转，始终朝前 */
+        .guide-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) translateZ(220px);
+            width: var(--note-width);
+            height: calc(var(--disk-height) * 4 + 20px);
+            border: 2px solid var(--accent-color);
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.4), inset 0 0 10px rgba(0, 255, 204, 0.2);
+            border-radius: 4px;
+            pointer-events: none; /* 不遮挡鼠标点击 */
+            z-index: 200;
+        }
+
+        /* 单个圆环 */
+        .ring {
+            position: relative;
+            width: 0; height: var(--disk-height); /* 简化定位 */
+            transform-style: preserve-3d;
+            margin: 2px 0;
+            cursor: grab;
+            transition: transform 0.2s ease-out; /* 增加平滑感 */
+        }
+
+        .ring:active { cursor: grabbing; }
+
+        /* 侧边音符面板 */
+        .note-panel {
+            position: absolute;
+            width: var(--note-width);
+            height: var(--disk-height);
+            left: calc(var(--note-width) / -2);
+            background: linear-gradient(135deg, #222 0%, #111 100%);
+            border: 1px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.5rem;
+            backface-visibility: hidden;
+            box-sizing: border-box;
+            color: #888;
+        }
+
+        /* 高亮在正前方的音符（通过JS控制） */
+        .note-panel.active {
+            color: var(--accent-color);
+            text-shadow: 0 0 10px var(--accent-color);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h2>HARMONIC CRYPTEX</h2>
+        <p class="hint">拖拽圆盘水平旋转 | 拖拽背景改变视角</p>
+    </div>
+
+    <div id="viewport">
+        <div class="guide-overlay"></div>
+        
+        <div id="world">
+            </div>
+    </div>
+
+    <script>
+        const notes = ["F", "C", "G", "D", "A", "E", "B", "Gb", "Db", "Ab", "Eb", "Bb"];
+        const ringCount = 4;
+        const world = document.getElementById('world');
+        
+        let worldRotX = -10;
+        let worldRotY = 0;
+        let activeRing = null;
+        let startX, startY;
+        let startRot = 0;
+
+        function init() {
+            for (let r = 0; r < ringCount; r++) {
+                const ring = document.createElement('div');
+                ring.className = 'ring';
+                ring.dataset.currentY = 0; // 当前旋转角度
+                
+                notes.forEach((note, i) => {
+                    const panel = document.createElement('div');
+                    panel.className = 'note-panel';
+                    panel.innerText = note;
+                    
+                    // 12个音，每个30度
+                    const angle = i * 30;
+                    // 将面板推到圆周边缘
+                    panel.style.transform = `rotateY(${-angle}deg) translateZ(${varToPx('--disk-radius')}px)`;
+                    ring.appendChild(panel);
+                });
+                
+                world.appendChild(ring);
+            }
+        }
+
+        function varToPx(name) {
+            return parseInt(getComputedStyle(document.documentElement).getPropertyValue(name));
+        }
+
+        // 交互逻辑
+        window.onmousedown = (e) => {
+            startX = e.clientX;
+            startY = e.clientY;
+            
+            const hitRing = e.target.closest('.ring');
+            if (hitRing) {
+                // 点击了圆盘
+                activeRing = hitRing;
+                startRot = parseFloat(activeRing.dataset.currentY);
+                activeRing.style.transition = "none"; // 拖拽时取消动画，增加跟手感
+            } else {
+                // 点击了背景
+                activeRing = null;
+            }
+        };
+
+        window.onmousemove = (e) => {
+            if (startX === undefined) return;
+
+            const deltaX = e.clientX - startX;
+            const deltaY = e.clientY - startY;
+
+            if (activeRing) {
+                // 局部旋转：只改当前环的 Y 轴
+                let newRot = startRot + deltaX * 0.5;
+                activeRing.dataset.currentY = newRot;
+                activeRing.style.transform = `rotateY(${newRot}deg)`;
+            } else {
+                // 整体旋转：旋转整个 world 容器
+                let newWorldY = worldRotY + deltaX * 0.3;
+                let newWorldX = worldRotX - deltaY * 0.3;
+                // 限制俯仰角
+                newWorldX = Math.max(-40, Math.min(40, newWorldX));
+                world.style.transform = `rotateX(${newWorldX}deg) rotateY(${newWorldY}deg)`;
+            }
+        };
+
+        window.onmouseup = () => {
+            if (activeRing) {
+                // 吸附功能：松开时对齐到最近的 30 度倍数
+                let currentRot = parseFloat(activeRing.dataset.currentY);
+                let snappedRot = Math.round(currentRot / 30) * 30;
+                
+                activeRing.style.transition = "transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
+                activeRing.style.transform = `rotateY(${snappedRot}deg)`;
+                activeRing.dataset.currentY = snappedRot;
+            } else {
+                // 保存全局旋转状态
+                const style = window.getComputedStyle(world);
+                const matrix = new WebKitCSSMatrix(style.transform);
+                // 这里简单更新变量，不从矩阵精确还原了，避免万向节死锁计算
+                // 直接通过最后一次 move 确定的值更新即可（已在 handleMove 处理）
+                worldRotY += (event.clientX - startX) * 0.3; 
+                // 注意：这里为了严谨，应当记录最后的角度
+            }
+            
+            // 重置状态
+            startX = undefined;
+            // 更新一下全局角度记录
+            updateGlobalAngles();
+        };
+
+        function updateGlobalAngles() {
+            // 解析当前的变换角度，防止下次旋转跳回原位
+            const transform = world.style.transform;
+            const xMatch = transform.match(/rotateX\((.*?)deg\)/);
+            const yMatch = transform.match(/rotateY\((.*?)deg\)/);
+            if (xMatch) worldRotX = parseFloat(xMatch[1]);
+            if (yMatch) worldRotY = parseFloat(yMatch[1]);
+        }
+
+        init();
+    </script>
+</body>
+</html>
